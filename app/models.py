@@ -1,3 +1,165 @@
 from django.db import models
 
-# Create your models here.
+
+class Usuario(models.Model):
+    TIPO_CHOICES = [
+        ("admin", "Admin"),
+        ("operador", "Operador"),
+    ]
+
+    nome = models.CharField(max_length=100, verbose_name="Nome")
+    email = models.EmailField(max_length=150, unique=True, verbose_name="E-mail")
+    senha = models.CharField(max_length=255, verbose_name="Senha")
+    tipo = models.CharField(max_length=8, choices=TIPO_CHOICES, default="operador", verbose_name="Tipo")
+    criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
+
+    class Meta:
+        db_table = "usuario"
+        verbose_name = "Usuário"
+        verbose_name_plural = "Usuários"
+
+    def __str__(self):
+        return f"{self.nome} ({self.email})"
+
+
+class Cliente(models.Model):
+    TIPO_CHOICES = [
+        ("avulso", "Avulso"),
+        ("mensalista", "Mensalista"),
+    ]
+
+    nome = models.CharField(max_length=100, verbose_name="Nome")
+    cpf = models.CharField(max_length=14, unique=True, verbose_name="CPF")
+    telefone = models.CharField(max_length=20, null=True, blank=True, verbose_name="Telefone")
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default="avulso", verbose_name="Tipo")
+    criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
+
+    class Meta:
+        db_table = "cliente"
+        verbose_name = "Cliente"
+        verbose_name_plural = "Clientes"
+
+    def __str__(self):
+        return f"{self.nome} - {self.cpf}"
+
+
+class Veiculo(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Cliente")
+    placa = models.CharField(max_length=10, unique=True, verbose_name="Placa")
+    modelo = models.CharField(max_length=80, null=True, blank=True, verbose_name="Modelo")
+    cor = models.CharField(max_length=40, null=True, blank=True, verbose_name="Cor")
+
+    class Meta:
+        db_table = "veiculo"
+        verbose_name = "Veículo"
+        verbose_name_plural = "Veículos"
+
+    def __str__(self):
+        return f"{self.placa} ({self.modelo or '---'})"
+
+
+class Vaga(models.Model):
+    TIPO_CHOICES = [
+        ("carro", "Carro"),
+        ("moto", "Moto"),
+        ("deficiente", "Deficiente"),
+        ("idoso", "Idoso"),
+    ]
+    STATUS_CHOICES = [
+        ("livre", "Livre"),
+        ("ocupada", "Ocupada"),
+    ]
+
+    numero = models.CharField(max_length=10, unique=True, verbose_name="Número")
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default="carro", verbose_name="Tipo")
+    status = models.CharField(max_length=8, choices=STATUS_CHOICES, default="livre", verbose_name="Status")
+
+    class Meta:
+        db_table = "vaga"
+        verbose_name = "Vaga"
+        verbose_name_plural = "Vagas"
+
+    def __str__(self):
+        return f"Vaga {self.numero} ({self.tipo}) [{self.status}]"
+
+
+class Tarifa(models.Model):
+    TIPO_VEICULO_CHOICES = [
+        ("carro", "Carro"),
+        ("moto", "Moto"),
+        ("todos", "Todos"),
+    ]
+
+    descricao = models.CharField(max_length=100, verbose_name="Descrição")
+    valor_hora = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Valor por Hora")
+    valor_diaria = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name="Valor Diário")
+    tipo_veiculo = models.CharField(max_length=5, choices=TIPO_VEICULO_CHOICES, default="todos", verbose_name="Tipo de Veículo")
+
+    class Meta:
+        db_table = "tarifa"
+        verbose_name = "Tarifa"
+        verbose_name_plural = "Tarifas"
+
+    def __str__(self):
+        return f"{self.descricao} ({self.tipo_veiculo})"
+
+
+class Ticket(models.Model):
+    STATUS_CHOICES = [
+        ("aberto", "Aberto"),
+        ("finalizado", "Finalizado"),
+        ("cancelado", "Cancelado"),
+    ]
+
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, verbose_name="Veículo")
+    vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, verbose_name="Vaga")
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
+    entrada = models.DateTimeField(auto_now_add=True, verbose_name="Entrada")
+    saida = models.DateTimeField(null=True, blank=True, verbose_name="Saída")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="aberto", verbose_name="Status")
+
+    class Meta:
+        db_table = "ticket"
+        verbose_name = "Ticket"
+        verbose_name_plural = "Tickets"
+
+    def __str__(self):
+        return f"Ticket {self.id} - {self.veiculo.placa} ({self.status})"
+
+
+class Pagamento(models.Model):
+    FORMA_PAGAMENTO_CHOICES = [
+        ("dinheiro", "Dinheiro"),
+        ("cartao_debito", "Cartão Débito"),
+        ("cartao_credito", "Cartão Crédito"),
+        ("pix", "PIX"),
+    ]
+
+    ticket = models.OneToOneField(Ticket, on_delete=models.CASCADE, verbose_name="Ticket")
+    tarifa = models.ForeignKey(Tarifa, on_delete=models.CASCADE, verbose_name="Tarifa")
+    valor_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Valor Total")
+    forma_pagamento = models.CharField(max_length=20, choices=FORMA_PAGAMENTO_CHOICES, verbose_name="Forma de Pagamento")
+    pago_em = models.DateTimeField(auto_now_add=True, verbose_name="Pago em")
+
+    class Meta:
+        db_table = "pagamento"
+        verbose_name = "Pagamento"
+        verbose_name_plural = "Pagamentos"
+
+    def __str__(self):
+        return f"Pagamento {self.id} - {self.ticket}"
+
+
+class Avaria(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, verbose_name="Ticket")
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
+    descricao = models.TextField(verbose_name="Descrição")
+    registrado_em = models.DateTimeField(auto_now_add=True, verbose_name="Registrado em")
+
+    class Meta:
+        db_table = "avaria"
+        verbose_name = "Avaria"
+        verbose_name_plural = "Avarias"
+
+    def __str__(self):
+        return f"Avaria {self.id} no Ticket {self.ticket.id}"
