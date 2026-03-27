@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Vagora</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <main style="max-width: 900px; margin: 60px auto; padding: 24px;">
+    <h1>Dashboard</h1>
+    <p>Bem-vindo, {{ request.user.username }}.</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit">Sair</button>
+    </form>
+  </main>
+</body>
+</html>

@@ -81,7 +81,14 @@
       <div class="login-title">Acesso restrito</div>
       <div class="login-sub">// somente usuários autorizados</div>
 
-      <form method="post" action="/accounts/login/">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="login-sub">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
         <div class="form-group">
           <label for="username">Usuário</label>
           <input type="text" id="username" name="username" placeholder="seu login" autocomplete="username" required>
