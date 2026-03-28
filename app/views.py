@@ -29,6 +29,24 @@ class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'dashboard.html')
 
+class ContatoView(View):
+    def get(self, request):
+        return render(request, 'contato.html')
+
+    def post(self, request):
+        nome = request.POST.get('nome', '').strip()
+        email = request.POST.get('email', '').strip()
+        assunto = request.POST.get('assunto', '').strip()
+        mensagem = request.POST.get('mensagem', '').strip()
+
+        if not all([nome, email, assunto, mensagem]):
+            messages.error(request, 'Por favor, preencha todos os campos.')
+            return render(request, 'contato.html', status=400)
+
+        # Aqui você pode adicionar lógica para enviar email ou salvar em BD
+        messages.success(request, 'Mensagem enviada com sucesso! Retornaremos em breve.')
+        return render(request, 'contato.html')
+
 
 class LogoutView(LoginRequiredMixin, View):
     def post(self, request):
