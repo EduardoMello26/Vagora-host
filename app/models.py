@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -113,7 +114,8 @@ class Ticket(models.Model):
 
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, verbose_name="Veículo")
     vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, verbose_name="Vaga")
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
+    operador = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Operador")
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, verbose_name="Cliente")
     entrada = models.DateTimeField(auto_now_add=True, verbose_name="Entrada")
     saida = models.DateTimeField(null=True, blank=True, verbose_name="Saída")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="aberto", verbose_name="Status")
@@ -123,8 +125,22 @@ class Ticket(models.Model):
         verbose_name = "Ticket"
         verbose_name_plural = "Tickets"
 
+    def clean(self):
+        super().clean()
+        if self.veiculo_id and self.cliente_id:
+            if self.veiculo.cliente_id and self.veiculo.cliente_id != self.cliente_id:
+                raise ValidationError({"cliente": "O cliente do ticket deve ser o mesmo cliente do veículo."})
+
     def __str__(self):
         return f"Ticket {self.id} - {self.veiculo.placa} ({self.status})"
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        # Se o veiculo ainda nao tiver cliente, vincula automaticamente ao cliente do ticket.
+        if self.veiculo_id and self.cliente_id and self.veiculo.cliente_id is None:
+            self.veiculo.cliente = self.cliente
+            self.veiculo.save(update_fields=["cliente"])
+        super().save(*args, **kwargs)
 
 
 class Pagamento(models.Model):

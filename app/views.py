@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
+from .forms import ClienteForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -28,6 +29,22 @@ class IndexView(View):
 class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'dashboard.html')
+
+
+class ClienteCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = ClienteForm()
+        return render(request, 'cliente_form.html', {'form': form})
+
+    def post(self, request):
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente cadastrado com sucesso.')
+            return redirect('cliente_create')
+
+        messages.error(request, 'Corrija os campos destacados e tente novamente.')
+        return render(request, 'cliente_form.html', {'form': form}, status=400)
 
 class ContatoView(View):
     def get(self, request):

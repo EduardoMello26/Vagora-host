@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora - Cadastrar cliente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+    <div class="nav-right">
+      <div class="nav-status">
+        <div class="status-dot"></div>
+        sistema online
+      </div>
+      <span>v1.0.0</span>
+    </div>
+  </nav>
+
+  <div class="contact-wrapper">
+    <div class="contact-card">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <a href="{% url 'dashboard' %}" class="back-link">&#8592; voltar ao dashboard</a>
+
+      <div class="card-tag">cadastro</div>
+      <div class="card-title">Novo cliente</div>
+      <p class="card-sub">
+        Preencha os dados minimos para registrar o cliente e permitir a abertura do ticket.
+      </p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="form-feedback {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        <div class="form-feedback error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <form method="post" action="{% url 'cliente_create' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="id_nome">Nome <span class="required">*</span></label>
+          {{ form.nome }}
+          {% if form.nome.errors %}
+            <div class="form-feedback error">{{ form.nome.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_cpf">CPF <span class="required">*</span></label>
+          {{ form.cpf }}
+          {% if form.cpf.errors %}
+            <div class="form-feedback error">{{ form.cpf.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="id_telefone">Telefone</label>
+            {{ form.telefone }}
+            {% if form.telefone.errors %}
+              <div class="form-feedback error">{{ form.telefone.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <label for="id_tipo">Tipo <span class="required">*</span></label>
+            {{ form.tipo }}
+            {% if form.tipo.errors %}
+              <div class="form-feedback error">{{ form.tipo.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">&#9654; salvar cliente</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

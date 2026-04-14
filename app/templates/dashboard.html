@@ -3,25 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Vagora</title>
+  <title>Vagora - Dashboard</title>
   {% load static %}
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-  <main style="max-width: 900px; margin: 60px auto; padding: 24px;">
-    <h1>Dashboard</h1>
-    <p>Bem-vindo, {{ request.user.username }}.</p>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-    {% if messages %}
-      {% for message in messages %}
-        <p>{{ message }}</p>
-      {% endfor %}
-    {% endif %}
+  <nav class="dashboard-nav">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+
+    <div class="dashboard-nav-links">
+      <a href="{% url 'dashboard' %}" class="dashboard-link active">dashboard</a>
+      <a href="{% url 'cliente_create' %}" class="dashboard-link">clientes</a>
+      <a href="{% url 'contato' %}" class="dashboard-link">suporte</a>
+    </div>
 
     <form method="post" action="{% url 'logout' %}">
       {% csrf_token %}
-      <button type="submit">Sair</button>
+      <button type="submit" class="btn-nav-logout">sair</button>
     </form>
+  </nav>
+
+  <main class="dashboard-main">
+    <section class="dashboard-welcome">
+      <div class="hero-tag">painel operacional</div>
+      <h1>Bem-vindo, <span>{{ request.user.username }}</span></h1>
+      <p class="hero-desc">
+        Acesse rapidamente os fluxos principais de cadastro e atendimento. Este painel segue o mesmo padrao visual das telas de login e contato.
+      </p>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="dashboard-card reveal visible">
+        <div class="feature-title">Cadastro de clientes</div>
+        <p class="feature-desc">Registre cliente avulso ou mensalista para liberar abertura de ticket sem friccao.</p>
+        <a href="{% url 'cliente_create' %}" class="btn-secondary">abrir cadastro</a>
+      </article>
+
+      <article class="dashboard-card reveal visible">
+        <div class="feature-title">Suporte</div>
+        <p class="feature-desc">Comunique incidentes e duvidas operacionais para o time responsavel.</p>
+        <a href="{% url 'contato' %}" class="btn-secondary">falar com suporte</a>
+      </article>
+    </section>
+
+    {% if messages %}
+      <section class="dashboard-messages">
+      {% for message in messages %}
+        <div class="form-feedback {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+      {% endfor %}
+      </section>
+    {% endif %}
+
   </main>
 </body>
 </html>
