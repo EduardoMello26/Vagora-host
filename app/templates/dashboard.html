@@ -56,11 +56,22 @@
     {% if messages %}
       <section class="dashboard-messages">
       {% for message in messages %}
-        <div class="form-feedback {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
       {% endfor %}
       </section>
     {% endif %}
 
   </main>
+
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
+        messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(-6px)';
+        setTimeout(() => messageElement.remove(), 300);
+      });
+    }, 3000);
+  </script>
 </body>
 </html>

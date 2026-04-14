@@ -55,6 +55,12 @@
         Preencha o formulário e retornaremos em breve.
       </p>
 
+      {% if messages %}
+        {% for message in messages %}
+          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
       <form method="post" action="{% url 'contato' %}" id="contact-form">
         {% csrf_token %}
 
@@ -90,13 +96,6 @@
         <button type="submit" class="btn-submit">
           &#9654; enviar mensagem
         </button>
-
-        <div class="form-feedback success" id="feedback-success">
-          &#10003; &nbsp;Mensagem enviada com sucesso! Retornaremos em breve.
-        </div>
-        <div class="form-feedback error" id="feedback-error">
-          &#9888; &nbsp;Erro ao enviar. Tente novamente ou contate o administrador.
-        </div>
       </form>
 
     </div>
@@ -120,6 +119,15 @@
       if (len >= 500) counter.classList.add('limit');
       else if (len >= 400) counter.classList.add('warn');
     });
+
+    setTimeout(() => {
+      document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
+        messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(-6px)';
+        setTimeout(() => messageElement.remove(), 300);
+      });
+    }, 3000);
   </script>
 
 </body>
