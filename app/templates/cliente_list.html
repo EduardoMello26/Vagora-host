@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora - Lista de clientes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav class="app-nav">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link active">clientes</a>
+      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
+    </div>
+
+    <div class="app-nav-actions">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-nav-logout">sair</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="dashboard-main">
+    <section class="dashboard-welcome">
+      <div class="hero-tag">clientes</div>
+      <h1>Lista de <span>clientes</span></h1>
+      <p class="hero-desc">Consulte os cadastros e use o atalho de edicao para manter os dados atualizados.</p>
+      <a href="{% url 'cliente_create' %}" class="btn-primary">&#9654; novo cliente</a>
+    </section>
+
+    {% if messages %}
+      <section class="dashboard-messages">
+        {% for message in messages %}
+          <div class="form-feedback {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    <section class="client-list-wrap">
+      <div class="client-list-header">
+        <span>nome</span>
+        <span>cpf</span>
+        <span>telefone</span>
+        <span>tipo</span>
+        <span>acoes</span>
+      </div>
+
+      {% for cliente in clientes %}
+        <article class="client-row">
+          <span>{{ cliente.nome }}</span>
+          <span>{{ cliente.cpf }}</span>
+          <span>{{ cliente.telefone|default:'-' }}</span>
+          <span>{{ cliente.get_tipo_display }}</span>
+          <span><a href="{% url 'cliente_edit' cliente.id %}" class="btn-secondary">editar</a></span>
+        </article>
+      {% empty %}
+        <article class="dashboard-card">
+          <div class="feature-title">Nenhum cliente cadastrado</div>
+          <p class="feature-desc">Cadastre o primeiro cliente para iniciar os atendimentos e abertura de tickets.</p>
+          <a href="{% url 'cliente_create' %}" class="btn-secondary">cadastrar cliente</a>
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

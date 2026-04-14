@@ -34,7 +34,7 @@ class DashboardView(LoginRequiredMixin, View):
 class ClienteCreateView(LoginRequiredMixin, View):
     def get(self, request):
         form = ClienteForm()
-        return render(request, 'cliente_form.html', {'form': form})
+        return render(request, 'cliente_form.html', {'form': form, 'is_edit': False})
 
     def post(self, request):
         form = ClienteForm(request.POST)
@@ -44,7 +44,33 @@ class ClienteCreateView(LoginRequiredMixin, View):
             return redirect('cliente_create')
 
         messages.error(request, 'Corrija os campos destacados e tente novamente.')
-        return render(request, 'cliente_form.html', {'form': form}, status=400)
+        return render(request, 'cliente_form.html', {'form': form, 'is_edit': False}, status=400)
+
+
+class ClienteListView(LoginRequiredMixin, View):
+    def get(self, request):
+        clientes = Cliente.objects.all().order_by('nome')
+        return render(request, 'cliente_list.html', {'clientes': clientes})
+
+
+class ClienteUpdateView(LoginRequiredMixin, View):
+    def get(self, request, cliente_id):
+        cliente = get_object_or_404(Cliente, id=cliente_id)
+        form = ClienteForm(instance=cliente)
+        context = {'form': form, 'cliente': cliente, 'is_edit': True}
+        return render(request, 'cliente_form.html', context)
+
+    def post(self, request, cliente_id):
+        cliente = get_object_or_404(Cliente, id=cliente_id)
+        form = ClienteForm(request.POST, instance=cliente)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente atualizado com sucesso.')
+            return redirect('cliente_list')
+
+        messages.error(request, 'Corrija os campos destacados e tente novamente.')
+        context = {'form': form, 'cliente': cliente, 'is_edit': True}
+        return render(request, 'cliente_form.html', context, status=400)
 
 class ContatoView(View):
     def get(self, request):

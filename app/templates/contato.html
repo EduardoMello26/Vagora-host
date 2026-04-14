@@ -15,17 +15,27 @@
   <div class="orb orb2"></div>
 
   <!-- Navbar -->
-  <nav>
+  <nav class="app-nav">
     <div class="logo">
       <div class="logo-dot"></div>
       vagora
     </div>
-    <div class="nav-right">
-      <div class="nav-status">
-        <div class="status-dot"></div>
-        sistema online
-      </div>
-      <span>v1.0.0</span>
+
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
+      <a href="{% url 'cliente_create' %}" class="app-nav-link">clientes</a>
+      <a href="{% url 'contato' %}" class="app-nav-link active">suporte</a>
+    </div>
+
+    <div class="app-nav-actions">
+      {% if request.user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-nav-logout">sair</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn-nav-login">login</a>
+      {% endif %}
     </div>
   </nav>
 
@@ -37,7 +47,6 @@
       <div class="corner corner-bl"></div>
       <div class="corner corner-br"></div>
 
-      <a href="{% url 'login' %}" class="back-link">&#8592; voltar ao início</a>
 
       <div class="card-tag">suporte & feedback</div>
       <div class="card-title">Fale conosco</div>

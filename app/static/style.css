@@ -808,6 +808,7 @@ textarea {
 
 /* ── Dashboard ── */
 
+.app-nav,
 .dashboard-nav {
   position: fixed;
   top: 0;
@@ -824,12 +825,14 @@ textarea {
   backdrop-filter: blur(20px);
 }
 
+.app-nav-links,
 .dashboard-nav-links {
   display: flex;
   align-items: center;
   gap: 18px;
 }
 
+.app-nav-link,
 .dashboard-link {
   font-size: 11px;
   letter-spacing: 0.12em;
@@ -841,15 +844,22 @@ textarea {
   transition: all 0.2s;
 }
 
+.app-nav-link:hover,
 .dashboard-link:hover {
   color: var(--accent2);
   border-color: var(--border);
 }
 
+.app-nav-link.active,
 .dashboard-link.active {
   color: var(--accent);
   border-color: rgba(79,255,176,0.25);
   background: rgba(79,255,176,0.06);
+}
+
+.app-nav-actions {
+  display: flex;
+  align-items: center;
 }
 
 .btn-nav-logout {
@@ -868,6 +878,24 @@ textarea {
 .btn-nav-logout:hover {
   background: rgba(255,79,107,0.18);
   color: #ffd1d8;
+}
+
+.btn-nav-login {
+  border: 1px solid rgba(0,212,255,0.35);
+  background: rgba(0,212,255,0.1);
+  color: #9defff;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: 'DM Mono', monospace;
+  padding: 10px 14px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-nav-login:hover {
+  background: rgba(0,212,255,0.2);
+  color: #d8f9ff;
 }
 
 .dashboard-main {
@@ -913,11 +941,50 @@ textarea {
   margin-top: 24px;
 }
 
+.client-list-wrap {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.client-list-header,
+.client-row {
+  display: grid;
+  grid-template-columns: 2fr 1.3fr 1.4fr 1fr 0.9fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.client-list-header {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.client-row {
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.client-row:last-child {
+  border-bottom: none;
+}
+
+.client-row .btn-secondary {
+  padding: 10px 12px;
+  font-size: 11px;
+}
+
 @media (max-width: 900px) {
+  .app-nav,
   .dashboard-nav {
     padding: 0 20px;
   }
 
+  .app-nav-links,
   .dashboard-nav-links {
     gap: 8px;
   }
@@ -929,9 +996,23 @@ textarea {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+
+  .client-list-header,
+  .client-row {
+    grid-template-columns: 1fr;
+  }
+
+  .client-list-header {
+    display: none;
+  }
+
+  .client-row {
+    gap: 8px;
+  }
 }
 
 @media (max-width: 640px) {
+  .app-nav,
   .dashboard-nav {
     height: auto;
     gap: 10px;
@@ -939,10 +1020,15 @@ textarea {
     padding: 12px 14px;
   }
 
+  .app-nav-links,
   .dashboard-nav-links {
     order: 3;
     width: 100%;
     justify-content: flex-start;
+  }
+
+  .app-nav-actions {
+    margin-left: auto;
   }
 
   .dashboard-main {

@@ -12,19 +12,19 @@
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  <nav class="dashboard-nav">
+  <nav class="app-nav">
     <div class="logo">
       <div class="logo-dot"></div>
       vagora
     </div>
 
-    <div class="dashboard-nav-links">
-      <a href="{% url 'dashboard' %}" class="dashboard-link active">dashboard</a>
-      <a href="{% url 'cliente_create' %}" class="dashboard-link">clientes</a>
-      <a href="{% url 'contato' %}" class="dashboard-link">suporte</a>
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link active">dashboard</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
+      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
-    <form method="post" action="{% url 'logout' %}">
+    <form method="post" action="{% url 'logout' %}" class="app-nav-actions">
       {% csrf_token %}
       <button type="submit" class="btn-nav-logout">sair</button>
     </form>
