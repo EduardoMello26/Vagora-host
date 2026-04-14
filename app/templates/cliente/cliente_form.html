@@ -21,6 +21,7 @@
     <div class="app-nav-links">
       <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
       <a href="{% url 'cliente_list' %}" class="app-nav-link active">clientes</a>
+      <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -38,8 +39,6 @@
       <div class="corner corner-tr"></div>
       <div class="corner corner-bl"></div>
       <div class="corner corner-br"></div>
-
-
 
       <div class="card-tag">{% if is_edit %}edicao{% else %}cadastro{% endif %}</div>
       <div class="card-title">{% if is_edit %}Editar cliente{% else %}Novo cliente{% endif %}</div>

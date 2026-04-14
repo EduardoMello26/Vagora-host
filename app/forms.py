@@ -2,7 +2,7 @@ import re
 
 from django import forms
 
-from .models import Cliente
+from .models import Cliente, Veiculo
 
 
 class ClienteForm(forms.ModelForm):
@@ -38,3 +38,33 @@ class ClienteForm(forms.ModelForm):
     def clean_telefone(self):
         telefone = self.cleaned_data.get("telefone", "")
         return telefone.strip() or None
+
+
+class VeiculoForm(forms.ModelForm):
+    class Meta:
+        model = Veiculo
+        fields = ["cliente", "placa", "modelo", "cor"]
+        labels = {
+            "cliente": "Cliente",
+            "placa": "Placa",
+            "modelo": "Modelo",
+            "cor": "Cor",
+        }
+        widgets = {
+            "cliente": forms.Select(),
+            "placa": forms.TextInput(attrs={"placeholder": "AAA0A00"}),
+            "modelo": forms.TextInput(attrs={"placeholder": "modelo do veículo"}),
+            "cor": forms.TextInput(attrs={"placeholder": "cor do veículo"}),
+        }
+
+    def clean_placa(self):
+        placa = self.cleaned_data["placa"].strip().upper()
+        return placa
+
+    def clean_modelo(self):
+        modelo = self.cleaned_data.get("modelo", "")
+        return modelo.strip() or None
+
+    def clean_cor(self):
+        cor = self.cleaned_data.get("cor", "")
+        return cor.strip() or None

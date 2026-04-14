@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora - Lista de veículos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav class="app-nav">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
+      <a href="{% url 'veiculo_list' %}" class="app-nav-link active">veículos</a>
+      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
+    </div>
+
+    <div class="app-nav-actions">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-nav-logout">sair</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="dashboard-main">
+    <section class="dashboard-welcome">
+      <div class="hero-tag">veículos</div>
+      <h1>Lista de <span>veículos</span></h1>
+      <p class="hero-desc">Gerencie os veículos cadastrados, com vínculo opcional ao cliente.</p>
+      <a href="{% url 'veiculo_create' %}" class="btn-primary">&#9654; novo veículo</a>
+    </section>
+
+    {% if messages %}
+      <section class="dashboard-messages">
+        {% for message in messages %}
+          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    <section class="client-list-wrap">
+      <div class="client-list-header">
+        <span>placa</span>
+        <span>cliente</span>
+        <span>modelo</span>
+        <span>cor</span>
+        <span>ações</span>
+      </div>
+
+      {% for veiculo in veiculos %}
+        <article class="client-row">
+          <span>{{ veiculo.placa }}</span>
+          <span>{{ veiculo.cliente|default:'Sem cliente' }}</span>
+          <span>{{ veiculo.modelo|default:'-' }}</span>
+          <span>{{ veiculo.cor|default:'-' }}</span>
+          <span style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{% url 'veiculo_edit' veiculo.id %}" class="btn-secondary">editar</a>
+            <a href="{% url 'veiculo_delete' veiculo.id %}" class="btn-secondary">excluir</a>
+          </span>
+        </article>
+      {% empty %}
+        <article class="dashboard-card">
+          <div class="feature-title">Nenhum veículo cadastrado</div>
+          <p class="feature-desc">Cadastre o primeiro veículo para começar a operar os tickets.</p>
+          <a href="{% url 'veiculo_create' %}" class="btn-secondary">cadastrar veículo</a>
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
+        messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(-6px)';
+        setTimeout(() => messageElement.remove(), 300);
+      });
+    }, 3000);
+  </script>
+</body>
+</html>

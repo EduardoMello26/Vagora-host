@@ -8,6 +8,11 @@ urlpatterns = [
     path('clientes/novo/', ClienteCreateView.as_view(), name='cliente_create'),
     path('clientes/', ClienteListView.as_view(), name='cliente_list'),
     path('clientes/<int:cliente_id>/editar/', ClienteUpdateView.as_view(), name='cliente_edit'),
+    path('clientes/<int:cliente_id>/excluir/', ClienteDeleteView.as_view(), name='cliente_delete'),
+    path('veiculos/novo/', VeiculoCreateView.as_view(), name='veiculo_create'),
+    path('veiculos/', VeiculoListView.as_view(), name='veiculo_list'),
+    path('veiculos/<int:veiculo_id>/editar/', VeiculoUpdateView.as_view(), name='veiculo_edit'),
+    path('veiculos/<int:veiculo_id>/excluir/', VeiculoDeleteView.as_view(), name='veiculo_delete'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('contato/', ContatoView.as_view(), name='contato'),
 ]

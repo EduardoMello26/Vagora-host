@@ -747,6 +747,7 @@ textarea {
 .form-feedback {
   display: none;
   margin-top: 20px;
+  margin-bottom: 24px;
   padding: 14px 16px;
   border: 1px solid;
   font-size: 12px;

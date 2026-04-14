@@ -21,6 +21,7 @@
     <div class="app-nav-links">
       <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
       <a href="{% url 'cliente_list' %}" class="app-nav-link active">clientes</a>
+      <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -63,7 +64,10 @@
           <span>{{ cliente.cpf }}</span>
           <span>{{ cliente.telefone|default:'-' }}</span>
           <span>{{ cliente.get_tipo_display }}</span>
-          <span><a href="{% url 'cliente_edit' cliente.id %}" class="btn-secondary">editar</a></span>
+          <span style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{% url 'cliente_edit' cliente.id %}" class="btn-secondary">editar</a>
+            <a href="{% url 'cliente_delete' cliente.id %}" class="btn-secondary">excluir</a>
+          </span>
         </article>
       {% empty %}
         <article class="dashboard-card">
