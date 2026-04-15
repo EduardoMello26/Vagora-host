@@ -1,13 +1,17 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vagora - {% if is_edit %}Editar cliente{% else %}Cadastrar cliente{% endif %}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
+
 <body>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
@@ -44,9 +48,9 @@
       <div class="card-title">{% if is_edit %}Editar cliente{% else %}Novo cliente{% endif %}</div>
       <p class="card-sub">
         {% if is_edit %}
-          Atualize os dados do cliente selecionado e mantenha o cadastro consistente.
+        Atualize os dados do cliente selecionado e mantenha o cadastro consistente.
         {% else %}
-          Preencha os dados minimos para registrar o cliente e permitir a abertura do ticket.
+        Preencha os dados minimos para registrar o cliente e permitir a abertura do ticket.
         {% endif %}
       </p>
 
@@ -55,23 +59,25 @@
       </p>
 
       {% if messages %}
-        {% for message in messages %}
-          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
-        {% endfor %}
+      {% for message in messages %}
+      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{
+        message }}</div>
+      {% endfor %}
       {% endif %}
 
       {% if form.non_field_errors %}
-        <div class="form-feedback error">{{ form.non_field_errors }}</div>
+      <div class="form-feedback error">{{ form.non_field_errors }}</div>
       {% endif %}
 
-      <form method="post" action="{% if is_edit %}{% url 'cliente_edit' cliente.id %}{% else %}{% url 'cliente_create' %}{% endif %}">
+      <form method="post"
+        action="{% if is_edit %}{% url 'cliente_edit' cliente.id %}{% else %}{% url 'cliente_create' %}{% endif %}">
         {% csrf_token %}
 
         <div class="form-group">
           <label for="id_nome">Nome <span class="required">*</span></label>
           {{ form.nome }}
           {% if form.nome.errors %}
-            <div class="form-feedback error">{{ form.nome.errors|striptags }}</div>
+          <div class="form-feedback error">{{ form.nome.errors|striptags }}</div>
           {% endif %}
         </div>
 
@@ -79,7 +85,7 @@
           <label for="id_cpf">CPF <span class="required">*</span></label>
           {{ form.cpf }}
           {% if form.cpf.errors %}
-            <div class="form-feedback error">{{ form.cpf.errors|striptags }}</div>
+          <div class="form-feedback error">{{ form.cpf.errors|striptags }}</div>
           {% endif %}
         </div>
 
@@ -88,19 +94,20 @@
             <label for="id_telefone">Telefone</label>
             {{ form.telefone }}
             {% if form.telefone.errors %}
-              <div class="form-feedback error">{{ form.telefone.errors|striptags }}</div>
+            <div class="form-feedback error">{{ form.telefone.errors|striptags }}</div>
             {% endif %}
           </div>
           <div class="form-group">
             <label for="id_tipo">Tipo <span class="required">*</span></label>
             {{ form.tipo }}
             {% if form.tipo.errors %}
-              <div class="form-feedback error">{{ form.tipo.errors|striptags }}</div>
+            <div class="form-feedback error">{{ form.tipo.errors|striptags }}</div>
             {% endif %}
           </div>
         </div>
 
-        <button type="submit" class="btn-submit">&#9654; {% if is_edit %}atualizar cliente{% else %}salvar cliente{% endif %}</button>
+        <button type="submit" class="btn-submit">&#9654; {% if is_edit %}atualizar cliente{% else %}salvar cliente{%
+          endif %}</button>
       </form>
     </div>
   </div>
@@ -116,4 +123,5 @@
     }, 3000);
   </script>
 </body>
+
 </html>

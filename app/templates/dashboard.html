@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vagora - Dashboard</title>
   {% load static %}
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
+
 <body>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
@@ -36,7 +40,8 @@
       <div class="hero-tag">painel operacional</div>
       <h1>Bem-vindo, <span>{{ request.user.username }}</span></h1>
       <p class="hero-desc">
-        Acesse rapidamente os fluxos principais de cadastro e atendimento. Este painel segue o mesmo padrao visual das telas de login e contato.
+        Acesse rapidamente os fluxos principais de cadastro e atendimento. Este painel segue o mesmo padrao visual das
+        telas de login e contato.
       </p>
     </section>
 
@@ -61,11 +66,12 @@
     </section>
 
     {% if messages %}
-      <section class="dashboard-messages">
+    <section class="dashboard-messages">
       {% for message in messages %}
-        <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{
+        message }}</div>
       {% endfor %}
-      </section>
+    </section>
     {% endif %}
 
   </main>
@@ -81,4 +87,5 @@
     }, 3000);
   </script>
 </body>
+
 </html>

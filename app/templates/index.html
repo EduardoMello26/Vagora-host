@@ -1,162 +1,171 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vagora — Sistema de Estacionamento</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-{% load static %}
-<link rel="stylesheet" href="{% static 'style.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora — Sistema de Estacionamento</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
+
 <body>
 
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-<!-- Navbar -->
-<nav>
-  <div class="logo">
-    <div class="logo-dot"></div>
-    vagora
-  </div>
-  <div class="nav-right">
-    <div class="nav-status">
-      <div class="status-dot"></div>
-      sistema online
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
     </div>
-    <span>v1.0.0</span>
-  </div>
-</nav>
-
-<!-- Hero -->
-<section class="hero">
-
-  <!-- Esquerda: apresentação + stats -->
-  <div class="hero-left">
-    <div class="hero-tag">Sistema interno de gestão</div>
-
-    <h1>
-      Controle<br>
-      total do seu<br>
-      <span>estacionamento</span><span class="cursor"></span>
-    </h1>
-
-    <p class="hero-desc">
-      Vagora centraliza entradas, saídas, pagamentos e relatórios em uma plataforma segura de acesso exclusivo para operadores autorizados.
-    </p>
-
-    <div class="stats-row">
-      <div class="stat">
-        <span class="stat-value green" id="livres">—</span>
-        <span class="stat-label">Vagas livres</span>
+    <div class="nav-right">
+      <div class="nav-status">
+        <div class="status-dot"></div>
+        sistema online
       </div>
-      <div class="stat">
-        <span class="stat-value red" id="ocupadas">—</span>
-        <span class="stat-label">Ocupadas</span>
+      <span>v1.0.0</span>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+
+    <!-- Esquerda: apresentação + stats -->
+    <div class="hero-left">
+      <div class="hero-tag">Sistema interno de gestão</div>
+
+      <h1>
+        Controle<br>
+        total do seu<br>
+        <span>estacionamento</span><span class="cursor"></span>
+      </h1>
+
+      <p class="hero-desc">
+        Vagora centraliza entradas, saídas, pagamentos e relatórios em uma plataforma segura de acesso exclusivo para
+        operadores autorizados.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value green" id="livres">—</span>
+          <span class="stat-label">Vagas livres</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value red" id="ocupadas">—</span>
+          <span class="stat-label">Ocupadas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value warn" id="tickets">—</span>
+          <span class="stat-label">Tickets hoje</span>
+        </div>
       </div>
-      <div class="stat">
-        <span class="stat-value warn" id="tickets">—</span>
-        <span class="stat-label">Tickets hoje</span>
+
+      <div class="cta-group">
+        <a href="#login" class="btn-primary">
+          &#9654; acessar sistema
+        </a>
+        <a href="#funcionalidades" class="btn-secondary">
+          ver funcionalidades
+        </a>
       </div>
     </div>
 
-    <div class="cta-group">
-      <a href="#login" class="btn-primary">
-        &#9654; acessar sistema
-      </a>
-      <a href="#funcionalidades" class="btn-secondary">
-        ver funcionalidades
-      </a>
-    </div>
-  </div>
+    <!-- Direita: login -->
+    <div class="hero-right" id="login">
+      <div class="login-panel">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
 
-  <!-- Direita: login -->
-  <div class="hero-right" id="login">
-    <div class="login-panel">
-      <div class="corner corner-tl"></div>
-      <div class="corner corner-tr"></div>
-      <div class="corner corner-bl"></div>
-      <div class="corner corner-br"></div>
+        <div class="login-title">Acesso restrito</div>
+        <div class="login-sub">// somente usuários autorizados</div>
 
-      <div class="login-title">Acesso restrito</div>
-      <div class="login-sub">// somente usuários autorizados</div>
-
-      {% if messages %}
+        {% if messages %}
         {% for message in messages %}
-          <div class="login-sub">{{ message }}</div>
+        <div class="login-sub">{{ message }}</div>
         {% endfor %}
-      {% endif %}
+        {% endif %}
 
-      <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <div class="form-group">
-          <label for="username">Usuário</label>
-          <input type="text" id="username" name="username" placeholder="seu login" autocomplete="username" required>
-        </div>
-        <div class="form-group">
-          <label for="password">Senha</label>
-          <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
-        </div>
-        <button type="submit" class="btn-login">entrar no sistema</button>
-      </form>
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="username">Usuário</label>
+            <input type="text" id="username" name="username" placeholder="seu login" autocomplete="username" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Senha</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password"
+              required>
+          </div>
+          <button type="submit" class="btn-login">entrar no sistema</button>
+        </form>
 
-      <div class="login-footer">
-        Problemas de acesso? <a href="{% url 'contato' %}">fale com o admin</a>
+        <div class="login-footer">
+          Problemas de acesso? <a href="{% url 'contato' %}">fale com o admin</a>
+        </div>
       </div>
     </div>
-  </div>
 
-</section>
+  </section>
 
-<!-- Features -->
-<section class="features" id="funcionalidades">
-  <div class="feature-item reveal">
-    <span class="feature-icon">⬡</span>
-    <div class="feature-title">Controle de vagas</div>
-    <p class="feature-desc">Monitoramento em tempo real da ocupação. Visualize vagas livres e ocupadas instantaneamente.</p>
-  </div>
-  <div class="feature-item reveal">
-    <span class="feature-icon">◈</span>
-    <div class="feature-title">Tickets & pagamentos</div>
-    <p class="feature-desc">Geração automática de tickets na entrada e cálculo de tarifa na saída com múltiplas formas de pagamento.</p>
-  </div>
-  <div class="feature-item reveal">
-    <span class="feature-icon">◉</span>
-    <div class="feature-title">Cadastro de clientes</div>
-    <p class="feature-desc">Gerencie clientes avulsos e mensalistas com histórico de veículos e planos vinculados.</p>
-  </div>
-  <div class="feature-item reveal">
-    <span class="feature-icon">◧</span>
-    <div class="feature-title">Relatórios</div>
-    <p class="feature-desc">Dashboards administrativos com faturamento, ocupação e movimentação por período.</p>
-  </div>
-</section>
+  <!-- Features -->
+  <section class="features" id="funcionalidades">
+    <div class="feature-item reveal">
+      <span class="feature-icon">⬡</span>
+      <div class="feature-title">Controle de vagas</div>
+      <p class="feature-desc">Monitoramento em tempo real da ocupação. Visualize vagas livres e ocupadas
+        instantaneamente.</p>
+    </div>
+    <div class="feature-item reveal">
+      <span class="feature-icon">◈</span>
+      <div class="feature-title">Tickets & pagamentos</div>
+      <p class="feature-desc">Geração automática de tickets na entrada e cálculo de tarifa na saída com múltiplas formas
+        de pagamento.</p>
+    </div>
+    <div class="feature-item reveal">
+      <span class="feature-icon">◉</span>
+      <div class="feature-title">Cadastro de clientes</div>
+      <p class="feature-desc">Gerencie clientes avulsos e mensalistas com histórico de veículos e planos vinculados.</p>
+    </div>
+    <div class="feature-item reveal">
+      <span class="feature-icon">◧</span>
+      <div class="feature-title">Relatórios</div>
+      <p class="feature-desc">Dashboards administrativos com faturamento, ocupação e movimentação por período.</p>
+    </div>
+  </section>
 
-<!-- Footer -->
-<footer>
-  <div>vagora &copy; 2025 — uso interno</div>
-  <div>desenvolvido com <span>Django</span> + MySQL</div>
-</footer>
+  <!-- Footer -->
+  <footer>
+    <div>vagora &copy; 2025 — uso interno</div>
+    <div>desenvolvido com <span>Django</span> + MySQL</div>
+  </footer>
 
-<script>
-  // Simula dados de vagas (substituir por chamada Django)
-  setTimeout(() => {
-    document.getElementById('livres').textContent = '18';
-    document.getElementById('ocupadas').textContent = '12';
-    document.getElementById('tickets').textContent = '37';
-  }, 800);
+  <script>
+    // Simula dados de vagas (substituir por chamada Django)
+    setTimeout(() => {
+      document.getElementById('livres').textContent = '18';
+      document.getElementById('ocupadas').textContent = '12';
+      document.getElementById('tickets').textContent = '37';
+    }, 800);
 
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 100);
-      }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(r => observer.observe(r));
-</script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 100);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(r => observer.observe(r));
+  </script>
 
 </body>
+
 </html>

@@ -1,14 +1,18 @@
-  {% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vagora — Contato</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
-  
+
 </head>
+
 <body>
 
   <div class="orb orb1"></div>
@@ -30,12 +34,12 @@
 
     <div class="app-nav-actions">
       {% if request.user.is_authenticated %}
-        <form method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn-nav-logout">sair</button>
-        </form>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-nav-logout">sair</button>
+      </form>
       {% else %}
-        <a href="{% url 'login' %}" class="btn-nav-login">login</a>
+      <a href="{% url 'login' %}" class="btn-nav-login">login</a>
       {% endif %}
     </div>
   </nav>
@@ -57,9 +61,10 @@
       </p>
 
       {% if messages %}
-        {% for message in messages %}
-          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
-        {% endfor %}
+      {% for message in messages %}
+      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{
+        message }}</div>
+      {% endfor %}
       {% endif %}
 
       <form method="post" action="{% url 'contato' %}" id="contact-form">
@@ -90,7 +95,8 @@
 
         <div class="form-group">
           <label for="mensagem">Mensagem <span class="required">*</span></label>
-          <textarea id="mensagem" name="mensagem" placeholder="descreva sua dúvida ou sugestão..." maxlength="500" required></textarea>
+          <textarea id="mensagem" name="mensagem" placeholder="descreva sua dúvida ou sugestão..." maxlength="500"
+            required></textarea>
           <div class="char-counter" id="char-counter">0 / 500</div>
         </div>
 
@@ -111,7 +117,7 @@
   <script>
     // Contador de caracteres
     const textarea = document.getElementById('mensagem');
-    const counter  = document.getElementById('char-counter');
+    const counter = document.getElementById('char-counter');
 
     textarea.addEventListener('input', () => {
       const len = textarea.value.length;
@@ -132,4 +138,5 @@
   </script>
 
 </body>
+
 </html>
