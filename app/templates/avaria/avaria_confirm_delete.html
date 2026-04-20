@@ -1,17 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vagora - Excluir cliente</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
-    rel="stylesheet">
+  <title>Vagora - Excluir avaria</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
-
 <body>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
@@ -24,10 +20,10 @@
 
     <div class="app-nav-links">
       <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
-      <a href="{% url 'cliente_list' %}" class="app-nav-link active">clientes</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
       <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
-      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link active">avarias</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -47,20 +43,19 @@
       <div class="corner corner-br"></div>
 
       <div class="card-tag">exclusão</div>
-      <div class="card-title">Excluir cliente</div>
+      <div class="card-title">Excluir avaria</div>
       <p class="card-sub">
-        Tem certeza que deseja excluir o cliente <strong>{{ cliente.nome }}</strong>?
+        Tem certeza que deseja excluir a avaria do veículo <strong>{{ avaria.veiculo.placa }}</strong>?
       </p>
 
       <form method="post">
         {% csrf_token %}
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 12px;">
           <button type="submit" class="btn-submit">&#9654; confirmar exclusão</button>
-          <a href="{% url 'cliente_list' %}" class="btn-secondary">cancelar</a>
+          <a href="{% url 'avaria_list' %}" class="btn-secondary">cancelar</a>
         </div>
       </form>
     </div>
   </div>
 </body>
-
 </html>

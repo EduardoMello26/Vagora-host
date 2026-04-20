@@ -27,6 +27,7 @@
       <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
       <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -63,6 +64,12 @@
         <div class="feature-title">Tarifas por horário</div>
         <p class="feature-desc">Ajuste os valores por hora de acordo com cada faixa de horário para cálculo do ticket.</p>
         <a href="{% url 'tarifa_list' %}" class="btn-secondary">gerenciar tarifas</a>
+      </article>
+
+      <article class="dashboard-card reveal visible">
+        <div class="feature-title">Avarias</div>
+        <p class="feature-desc">Registre ocorrências por veículo e acompanhe histórico de danos com rapidez.</p>
+        <a href="{% url 'avaria_list' %}" class="btn-secondary">gerenciar avarias</a>
       </article>
 
       <article class="dashboard-card reveal visible">

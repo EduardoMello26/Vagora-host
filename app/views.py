@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from .models import *
-from .forms import ClienteForm, TarifaForm, VeiculoForm
+from .forms import AvariaForm, ClienteForm, TarifaForm, VeiculoForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -201,6 +201,64 @@ class VeiculoDeleteView(LoginRequiredMixin, View):
         veiculo.delete()
         messages.success(request, 'Veículo excluído com sucesso.')
         return redirect('veiculo_list')
+
+
+class AvariaCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = AvariaForm()
+        return render(request, 'avaria/avaria_form.html', {'form': form, 'is_edit': False})
+
+    def post(self, request):
+        form = AvariaForm(request.POST)
+        if form.is_valid():
+            avaria = form.save(commit=False)
+            avaria.operador = request.user
+            avaria.save()
+            messages.success(request, 'Avaria registrada com sucesso.')
+            return redirect('avaria_create')
+
+        messages.error(request, 'Corrija os campos destacados e tente novamente.')
+        return render(request, 'avaria/avaria_form.html', {'form': form, 'is_edit': False}, status=400)
+
+
+class AvariaListView(LoginRequiredMixin, View):
+    def get(self, request):
+        avarias = Avaria.objects.select_related('veiculo', 'operador').all().order_by('-registrado_em')
+        return render(request, 'avaria/avaria_list.html', {'avarias': avarias})
+
+
+class AvariaUpdateView(LoginRequiredMixin, View):
+    def get(self, request, avaria_id):
+        avaria = get_object_or_404(Avaria, id=avaria_id)
+        form = AvariaForm(instance=avaria)
+        context = {'form': form, 'avaria': avaria, 'is_edit': True}
+        return render(request, 'avaria/avaria_form.html', context)
+
+    def post(self, request, avaria_id):
+        avaria = get_object_or_404(Avaria, id=avaria_id)
+        form = AvariaForm(request.POST, instance=avaria)
+        if form.is_valid():
+            updated = form.save(commit=False)
+            updated.operador = avaria.operador
+            updated.save()
+            messages.success(request, 'Avaria atualizada com sucesso.')
+            return redirect('avaria_list')
+
+        messages.error(request, 'Corrija os campos destacados e tente novamente.')
+        context = {'form': form, 'avaria': avaria, 'is_edit': True}
+        return render(request, 'avaria/avaria_form.html', context, status=400)
+
+
+class AvariaDeleteView(LoginRequiredMixin, View):
+    def get(self, request, avaria_id):
+        avaria = get_object_or_404(Avaria, id=avaria_id)
+        return render(request, 'avaria/avaria_confirm_delete.html', {'avaria': avaria})
+
+    def post(self, request, avaria_id):
+        avaria = get_object_or_404(Avaria, id=avaria_id)
+        avaria.delete()
+        messages.success(request, 'Avaria excluída com sucesso.')
+        return redirect('avaria_list')
 
 class ContatoView(View):
     def get(self, request):

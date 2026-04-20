@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vagora - Grade de tarifas por horário</title>
+  <title>Vagora - Lista de avarias</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
@@ -22,8 +22,8 @@
       <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
       <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
-      <a href="{% url 'tarifa_list' %}" class="app-nav-link active">tarifas</a>
-      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
+      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link active">avarias</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -37,10 +37,10 @@
 
   <main class="dashboard-main">
     <section class="dashboard-welcome">
-      <div class="hero-tag">tarifas</div>
-      <h1>Tarifas por <span>horário</span></h1>
-      <p class="hero-desc">Nesta interface você visualiza todos os horários e ajusta os valores que alimentam o cálculo dos tickets.</p>
-      <a href="{% url 'tarifa_create' %}" class="btn-primary">&#9654; nova tarifa</a>
+      <div class="hero-tag">avarias</div>
+      <h1>Lista de <span>avarias</span></h1>
+      <p class="hero-desc">Visualize e gerencie as ocorrências registradas por veículo.</p>
+      <a href="{% url 'avaria_create' %}" class="btn-primary">&#9654; nova avaria</a>
     </section>
 
     {% if messages %}
@@ -53,31 +53,29 @@
 
     <section class="client-list-wrap">
       <div class="client-list-header">
+        <span>veículo</span>
+        <span>operador</span>
         <span>descrição</span>
-        <span>tipo</span>
-        <span>horário</span>
-        <span>valor/h</span>
-        <span>valor/dia</span>
+        <span>data</span>
         <span>ações</span>
       </div>
 
-      {% for tarifa in tarifas %}
+      {% for avaria in avarias %}
         <article class="client-row">
-          <span>{{ tarifa.descricao }}</span>
-          <span>{{ tarifa.get_tipo_veiculo_display }}</span>
-          <span>{{ tarifa.hora_inicio|time:'H:i' }} - {{ tarifa.hora_fim|time:'H:i' }}</span>
-          <span>R$ {{ tarifa.valor_hora }}</span>
-          <span>{% if tarifa.valor_diaria %}R$ {{ tarifa.valor_diaria }}{% else %}-{% endif %}</span>
+          <span>{{ avaria.veiculo }}</span>
+          <span>{{ avaria.operador }}</span>
+          <span>{{ avaria.descricao|truncatechars:60 }}</span>
+          <span>{{ avaria.registrado_em|date:'d/m/Y H:i' }}</span>
           <span style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="{% url 'tarifa_edit' tarifa.id %}" class="btn-secondary">editar</a>
-            <a href="{% url 'tarifa_delete' tarifa.id %}" class="btn-secondary">excluir</a>
+            <a href="{% url 'avaria_edit' avaria.id %}" class="btn-secondary">editar</a>
+            <a href="{% url 'avaria_delete' avaria.id %}" class="btn-secondary">excluir</a>
           </span>
         </article>
       {% empty %}
         <article class="dashboard-card">
-          <div class="feature-title">Nenhuma tarifa cadastrada</div>
-          <p class="feature-desc">Cadastre a primeira faixa de horário para começar o cálculo de tickets por período.</p>
-          <a href="{% url 'tarifa_create' %}" class="btn-secondary">cadastrar tarifa</a>
+          <div class="feature-title">Nenhuma avaria registrada</div>
+          <p class="feature-desc">Registre a primeira ocorrência para acompanhar os danos por veículo.</p>
+          <a href="{% url 'avaria_create' %}" class="btn-secondary">registrar avaria</a>
         </article>
       {% endfor %}
     </section>

@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora - {% if is_edit %}Editar avaria{% else %}Registrar avaria{% endif %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav class="app-nav">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
+      <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
+      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link active">avarias</a>
+      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
+    </div>
+
+    <div class="app-nav-actions">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-nav-logout">sair</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="contact-wrapper">
+    <div class="contact-card">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <div class="card-tag">{% if is_edit %}edicao{% else %}cadastro{% endif %}</div>
+      <div class="card-title">{% if is_edit %}Editar avaria{% else %}Nova avaria{% endif %}</div>
+      <p class="card-sub">
+        Registre a ocorrência vinculando o veículo atingido. O operador logado será salvo automaticamente.
+      </p>
+
+      <p style="margin-bottom: 20px;">
+        <a href="{% url 'avaria_list' %}" class="btn-secondary">ver lista de avarias</a>
+      </p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        <div class="form-feedback error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <form method="post" action="{% if is_edit %}{% url 'avaria_edit' avaria.id %}{% else %}{% url 'avaria_create' %}{% endif %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="id_veiculo">Veículo <span class="required">*</span></label>
+          {{ form.veiculo }}
+          {% if form.veiculo.errors %}
+            <div class="form-feedback error">{{ form.veiculo.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_descricao">Descrição <span class="required">*</span></label>
+          {{ form.descricao }}
+          {% if form.descricao.errors %}
+            <div class="form-feedback error">{{ form.descricao.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit">&#9654; {% if is_edit %}atualizar avaria{% else %}salvar avaria{% endif %}</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
+        messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(-6px)';
+        setTimeout(() => messageElement.remove(), 300);
+      });
+    }, 3000);
+  </script>
+</body>
+</html>

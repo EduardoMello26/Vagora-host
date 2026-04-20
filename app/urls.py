@@ -17,6 +17,10 @@ urlpatterns = [
     path('veiculos/', VeiculoListView.as_view(), name='veiculo_list'),
     path('veiculos/<int:veiculo_id>/editar/', VeiculoUpdateView.as_view(), name='veiculo_edit'),
     path('veiculos/<int:veiculo_id>/excluir/', VeiculoDeleteView.as_view(), name='veiculo_delete'),
+    path('avarias/novo/', AvariaCreateView.as_view(), name='avaria_create'),
+    path('avarias/', AvariaListView.as_view(), name='avaria_list'),
+    path('avarias/<int:avaria_id>/editar/', AvariaUpdateView.as_view(), name='avaria_edit'),
+    path('avarias/<int:avaria_id>/excluir/', AvariaDeleteView.as_view(), name='avaria_delete'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('contato/', ContatoView.as_view(), name='contato'),
 ]

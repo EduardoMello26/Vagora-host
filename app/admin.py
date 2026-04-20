@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import *
+from .models import Avaria, Cliente, Pagamento, Tarifa, Ticket, Vaga, Veiculo
 
 
 # Register your models here.
-admin.site.register(Usuario)
 admin.site.register(Cliente)
 admin.site.register(Veiculo)
 admin.site.register(Vaga)
@@ -13,9 +12,15 @@ admin.site.register(Vaga)
 class TicketAdmin(admin.ModelAdmin):
 	list_display = ("id", "cliente", "veiculo", "vaga", "operador", "status", "entrada", "saida")
 	list_filter = ("status", "entrada")
-	search_fields = ("cliente__nome", "cliente__cpf", "veiculo__placa", "operador__nome")
+	search_fields = ("cliente__nome", "cliente__cpf", "veiculo__placa", "operador__username", "operador__email")
 
 
 admin.site.register(Pagamento)
 admin.site.register(Tarifa)
-admin.site.register(Avaria)
+
+
+@admin.register(Avaria)
+class AvariaAdmin(admin.ModelAdmin):
+	list_display = ("id", "veiculo", "operador", "registrado_em")
+	list_filter = ("registrado_em",)
+	search_fields = ("veiculo__placa", "operador__username", "descricao")

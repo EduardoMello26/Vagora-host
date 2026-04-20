@@ -1,26 +1,6 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-
-
-class Usuario(models.Model):
-    TIPO_CHOICES = [
-        ("admin", "Admin"),
-        ("operador", "Operador"),
-    ]
-
-    nome = models.CharField(max_length=100, verbose_name="Nome")
-    email = models.EmailField(max_length=150, unique=True, verbose_name="E-mail")
-    senha = models.CharField(max_length=255, verbose_name="Senha")
-    tipo = models.CharField(max_length=8, choices=TIPO_CHOICES, default="operador", verbose_name="Tipo")
-    criado_em = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
-
-    class Meta:
-        db_table = "usuario"
-        verbose_name = "Usuário"
-        verbose_name_plural = "Usuários"
-
-    def __str__(self):
-        return f"{self.nome} ({self.email})"
 
 
 class Cliente(models.Model):
@@ -138,7 +118,7 @@ class Ticket(models.Model):
 
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, verbose_name="Veículo")
     vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, verbose_name="Vaga")
-    operador = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Operador")
+    operador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Operador")
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, verbose_name="Cliente")
     entrada = models.DateTimeField(auto_now_add=True, verbose_name="Entrada")
     saida = models.DateTimeField(null=True, blank=True, verbose_name="Saída")
@@ -191,8 +171,8 @@ class Pagamento(models.Model):
 
 
 class Avaria(models.Model):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, verbose_name="Ticket")
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Usuário")
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, verbose_name="Veículo")
+    operador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Operador")
     descricao = models.TextField(verbose_name="Descrição")
     registrado_em = models.DateTimeField(auto_now_add=True, verbose_name="Registrado em")
 
@@ -202,4 +182,4 @@ class Avaria(models.Model):
         verbose_name_plural = "Avarias"
 
     def __str__(self):
-        return f"Avaria {self.id} no Ticket {self.ticket.id}"
+        return f"Avaria {self.id} no veículo {self.veiculo.placa}"

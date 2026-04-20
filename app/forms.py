@@ -2,7 +2,7 @@ import re
 
 from django import forms
 
-from .models import Cliente, Tarifa, Veiculo
+from .models import Avaria, Cliente, Tarifa, Veiculo
 
 
 class ClienteForm(forms.ModelForm):
@@ -117,3 +117,17 @@ class TarifaForm(forms.ModelForm):
             raise forms.ValidationError("Ja existe uma tarifa que conflita com essa faixa de horário para o tipo de veículo informado.")
 
         return cleaned_data
+
+
+class AvariaForm(forms.ModelForm):
+    class Meta:
+        model = Avaria
+        fields = ["veiculo", "descricao"]
+        labels = {
+            "veiculo": "Veículo",
+            "descricao": "Descrição",
+        }
+        widgets = {
+            "veiculo": forms.Select(),
+            "descricao": forms.Textarea(attrs={"placeholder": "descreva a avaria", "rows": 5}),
+        }
