@@ -811,6 +811,160 @@ textarea {
   .form-row { grid-template-columns: 1fr; }
 }
 
+/* ── Vagas ── */
+
+.vaga-create-bar {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.vaga-create-field {
+  min-width: 220px;
+  margin-bottom: 0;
+}
+
+.vaga-bulk-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.btn-danger-outline {
+  border-color: rgba(255, 79, 107, 0.5);
+  color: #ff8ca0;
+}
+
+.btn-danger-outline:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  box-shadow: 0 10px 22px rgba(255, 79, 107, 0.2);
+}
+
+.stat-big {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -1px;
+  margin-top: 6px;
+}
+
+.stat-big.green { color: var(--accent); }
+.stat-big.red { color: var(--danger); }
+
+.vaga-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.vaga-grid-wrap {
+  margin-top: 8px;
+}
+
+.vaga-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 14px;
+}
+
+.vaga-slot-wrap {
+  position: relative;
+}
+
+.vaga-slot-form {
+  display: block;
+}
+
+.vaga-slot {
+  width: 100%;
+  min-height: 92px;
+  border: 1px solid var(--border);
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  color: #0a0a0f;
+  font-family: 'DM Mono', monospace;
+}
+
+.vaga-slot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.24);
+}
+
+.vaga-slot.livre {
+  background: linear-gradient(180deg, rgba(79,255,176,0.95), rgba(79,255,176,0.75));
+}
+
+.vaga-slot.ocupada {
+  background: linear-gradient(180deg, rgba(255,79,107,0.95), rgba(255,79,107,0.75));
+}
+
+.vaga-slot-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.vaga-slot-status {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.vaga-delete-link {
+  display: inline-flex;
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+}
+
+.vaga-delete-link:hover {
+  color: var(--danger);
+}
+
+.vaga-empty-card {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .vaga-summary-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .vaga-create-bar {
+    align-items: stretch;
+  }
+
+  .vaga-create-field {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .vaga-grid {
+    grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+  }
+
+  .vaga-slot {
+    min-height: 84px;
+  }
+}
+
 /* ── Dashboard ── */
 
 .app-nav,

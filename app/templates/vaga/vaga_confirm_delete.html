@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vagora - Excluir tarifa</title>
+  <title>Vagora - Excluir vaga</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
@@ -22,10 +22,10 @@
       <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
       <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
-      <a href="{% url 'tarifa_list' %}" class="app-nav-link active">tarifas</a>
+      <a href="{% url 'vaga_list' %}" class="app-nav-link active">vagas</a>
+      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
       <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
-        <a href="{% url 'vaga_list' %}" class="app-nav-link">vagas</a>
     </div>
 
     <div class="app-nav-actions">
@@ -44,16 +44,16 @@
       <div class="corner corner-br"></div>
 
       <div class="card-tag">exclusão</div>
-      <div class="card-title">Excluir tarifa</div>
+      <div class="card-title">Excluir vaga</div>
       <p class="card-sub">
-        Tem certeza que deseja excluir a tarifa <strong>{{ tarifa.descricao }}</strong> ({{ tarifa.hora_inicio|time:'H:i' }} - {{ tarifa.hora_fim|time:'H:i' }})?
+        Tem certeza que deseja excluir a vaga <strong>{{ vaga.numero }}</strong>?
       </p>
 
       <form method="post">
         {% csrf_token %}
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 12px;">
           <button type="submit" class="btn-submit">&#9654; confirmar exclusão</button>
-          <a href="{% url 'tarifa_list' %}" class="btn-secondary">cancelar</a>
+          <a href="{% url 'vaga_list' %}" class="btn-secondary">cancelar</a>
         </div>
       </form>
     </div>

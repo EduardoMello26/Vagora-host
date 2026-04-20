@@ -5,7 +5,13 @@ from .models import Avaria, Cliente, Pagamento, Tarifa, Ticket, Vaga, Veiculo
 # Register your models here.
 admin.site.register(Cliente)
 admin.site.register(Veiculo)
-admin.site.register(Vaga)
+
+
+@admin.register(Vaga)
+class VagaAdmin(admin.ModelAdmin):
+	list_display = ("numero", "tipo", "status")
+	list_filter = ("tipo", "status")
+	search_fields = ("numero",)
 
 
 @admin.register(Ticket)

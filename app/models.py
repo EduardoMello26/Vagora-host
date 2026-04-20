@@ -51,7 +51,7 @@ class Vaga(models.Model):
         ("ocupada", "Ocupada"),
     ]
 
-    numero = models.CharField(max_length=10, unique=True, verbose_name="Número")
+    numero = models.PositiveIntegerField(unique=True, verbose_name="Número")
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default="carro", verbose_name="Tipo")
     status = models.CharField(max_length=8, choices=STATUS_CHOICES, default="livre", verbose_name="Status")
 
@@ -59,6 +59,7 @@ class Vaga(models.Model):
         db_table = "vaga"
         verbose_name = "Vaga"
         verbose_name_plural = "Vagas"
+        ordering = ["numero"]
 
     def __str__(self):
         return f"Vaga {self.numero} ({self.tipo}) [{self.status}]"

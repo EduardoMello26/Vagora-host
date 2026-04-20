@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora - Vagas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav class="app-nav">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
+      <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
+      <a href="{% url 'vaga_list' %}" class="app-nav-link active">vagas</a>
+      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
+      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
+    </div>
+
+    <div class="app-nav-actions">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-nav-logout">sair</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="dashboard-main">
+    <section class="dashboard-welcome">
+      <div class="hero-tag">vagas</div>
+      <h1>Gestão de <span>vagas</span></h1>
+      <p class="hero-desc">Informe a quantidade total desejada e clique nas vagas para alternar entre livre e ocupada.</p>
+
+      <form method="post" class="vaga-create-bar">
+        {% csrf_token %}
+        <div class="form-group vaga-create-field">
+          <label for="id_quantidade">Quantidade de vagas</label>
+          {{ form.quantidade }}
+          {% if form.quantidade.errors %}
+            <div class="form-feedback error">{{ form.quantidade.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <button type="submit" class="btn-primary">&#9654; gerar vagas</button>
+      </form>
+
+      <div class="vaga-bulk-actions">
+        <form method="post" action="{% url 'vaga_delete_all' %}" onsubmit="return confirm('Tem certeza que deseja excluir todas as vagas? Esta ação não pode ser desfeita.');">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary btn-danger-outline">excluir todas as vagas</button>
+        </form>
+      </div>
+    </section>
+
+    {% if messages %}
+      <section class="dashboard-messages">
+        {% for message in messages %}
+          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    <section class="vaga-summary-row">
+      <div class="dashboard-card">
+        <div class="feature-title">Total</div>
+        <p class="stat-big">{{ total_vagas }}</p>
+      </div>
+      <div class="dashboard-card">
+        <div class="feature-title">Livres</div>
+        <p class="stat-big green">{{ vagas_livres }}</p>
+      </div>
+      <div class="dashboard-card">
+        <div class="feature-title">Ocupadas</div>
+        <p class="stat-big red">{{ vagas_ocupadas }}</p>
+      </div>
+    </section>
+
+    <section class="vaga-grid-wrap">
+      <div class="vaga-grid">
+        {% for vaga in vagas %}
+          <div class="vaga-slot-wrap">
+            <form method="post" action="{% url 'vaga_toggle' vaga.id %}" class="vaga-slot-form">
+              {% csrf_token %}
+              <button type="submit" class="vaga-slot {{ vaga.status }}" aria-label="Alterar status da vaga {{ vaga.numero }}">
+                <span class="vaga-slot-number">{{ vaga.numero }}</span>
+                <span class="vaga-slot-status">{{ vaga.get_status_display }}</span>
+              </button>
+            </form>
+            <a href="{% url 'vaga_delete' vaga.id %}" class="vaga-delete-link">excluir</a>
+          </div>
+        {% empty %}
+          <article class="dashboard-card vaga-empty-card">
+            <div class="feature-title">Nenhuma vaga cadastrada</div>
+            <p class="feature-desc">Use o formulário acima para gerar as vagas automaticamente.</p>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
+        messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(-6px)';
+        setTimeout(() => messageElement.remove(), 300);
+      });
+    }, 3000);
+  </script>
+</body>
+</html>

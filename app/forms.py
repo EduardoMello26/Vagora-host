@@ -131,3 +131,7 @@ class AvariaForm(forms.ModelForm):
             "veiculo": forms.Select(),
             "descricao": forms.Textarea(attrs={"placeholder": "descreva a avaria", "rows": 5}),
         }
+
+
+class VagaQuantidadeForm(forms.Form):
+    quantidade = forms.IntegerField(min_value=1, max_value=500, label="Quantidade de vagas")

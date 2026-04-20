@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
+from django.db import transaction
 from .models import *
-from .forms import AvariaForm, ClienteForm, TarifaForm, VeiculoForm
+from .forms import AvariaForm, ClienteForm, TarifaForm, VagaQuantidadeForm, VeiculoForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -201,6 +202,93 @@ class VeiculoDeleteView(LoginRequiredMixin, View):
         veiculo.delete()
         messages.success(request, 'Veículo excluído com sucesso.')
         return redirect('veiculo_list')
+
+
+class VagaListView(LoginRequiredMixin, View):
+    def get(self, request):
+        vagas = Vaga.objects.all().order_by('numero')
+        form = VagaQuantidadeForm(initial={'quantidade': vagas.count() or 1})
+        context = {
+            'vagas': vagas,
+            'form': form,
+            'total_vagas': vagas.count(),
+            'vagas_livres': vagas.filter(status='livre').count(),
+            'vagas_ocupadas': vagas.filter(status='ocupada').count(),
+        }
+        return render(request, 'vaga/vaga_list.html', context)
+
+    def post(self, request):
+        form = VagaQuantidadeForm(request.POST)
+        vagas = Vaga.objects.all().order_by('numero')
+
+        if form.is_valid():
+            quantidade = form.cleaned_data['quantidade']
+            criadas = 0
+
+            with transaction.atomic():
+                for numero in range(1, quantidade + 1):
+                    _, created = Vaga.objects.get_or_create(numero=numero, defaults={'status': 'livre'})
+                    if created:
+                        criadas += 1
+
+            if criadas:
+                messages.success(request, f'{criadas} vaga(s) criada(s) com sucesso.')
+            else:
+                messages.success(request, 'Nenhuma nova vaga foi criada. Todas as vagas já existem.')
+
+            return redirect('vaga_list')
+
+        context = {
+            'vagas': vagas,
+            'form': form,
+            'total_vagas': vagas.count(),
+            'vagas_livres': vagas.filter(status='livre').count(),
+            'vagas_ocupadas': vagas.filter(status='ocupada').count(),
+        }
+        return render(request, 'vaga/vaga_list.html', context, status=400)
+
+
+class VagaToggleView(LoginRequiredMixin, View):
+    def post(self, request, vaga_id):
+        vaga = get_object_or_404(Vaga, id=vaga_id)
+        vaga.status = 'ocupada' if vaga.status == 'livre' else 'livre'
+        vaga.save(update_fields=['status'])
+        messages.success(request, f'Vaga {vaga.numero} atualizada para {vaga.get_status_display().lower()}.')
+        return redirect('vaga_list')
+
+
+class VagaDeleteView(LoginRequiredMixin, View):
+    def get(self, request, vaga_id):
+        vaga = get_object_or_404(Vaga, id=vaga_id)
+        return render(request, 'vaga/vaga_confirm_delete.html', {'vaga': vaga})
+
+    def post(self, request, vaga_id):
+        vaga = get_object_or_404(Vaga, id=vaga_id)
+        if Ticket.objects.filter(vaga=vaga).exists():
+            messages.error(request, 'Nao foi possivel excluir esta vaga porque ela possui tickets vinculados.')
+            return redirect('vaga_list')
+
+        vaga.delete()
+        messages.success(request, 'Vaga excluida com sucesso.')
+        return redirect('vaga_list')
+
+
+class VagaDeleteAllView(LoginRequiredMixin, View):
+    def post(self, request):
+        if Ticket.objects.filter(vaga__isnull=False).exists():
+            messages.error(request, 'Nao foi possivel excluir todas as vagas porque existe ticket vinculado a pelo menos uma vaga.')
+            return redirect('vaga_list')
+
+        total = Vaga.objects.count()
+        if total == 0:
+            messages.error(request, 'Nao existem vagas cadastradas para excluir.')
+            return redirect('vaga_list')
+
+        with transaction.atomic():
+            Vaga.objects.all().delete()
+
+        messages.success(request, f'{total} vaga(s) excluida(s) com sucesso.')
+        return redirect('vaga_list')
 
 
 class AvariaCreateView(LoginRequiredMixin, View):

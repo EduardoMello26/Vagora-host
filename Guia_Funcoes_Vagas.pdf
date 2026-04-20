@@ -1,0 +1,145 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2769 >>
+stream
+BT
+/F1 11 Tf
+50 800 Td
+(GUIA DAS FUNCOES RELACIONADAS AS VAGAS) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(1\\) MODELO Vaga \\(app/models.py\\)) Tj
+0 -14 Td
+(- Campo numero: inteiro unico que identifica a vaga.) Tj
+0 -14 Td
+(- Campo status: choices com valores livres ou ocupada.) Tj
+0 -14 Td
+(- Campo tipo: categoria da vaga \\(carro, moto, etc\\).) Tj
+0 -14 Td
+(- get_status_display\\(\\): metodo automatico do Django para exibir o label do choices.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(2\\) FORMULARIO VagaQuantidadeForm \\(app/forms.py\\)) Tj
+0 -14 Td
+(- Recebe a quantidade total desejada de vagas.) Tj
+0 -14 Td
+(- Regras: minimo 1 e maximo 500.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(3\\) VIEW VagaListView \\(app/views.py\\)) Tj
+0 -14 Td
+(GET:) Tj
+0 -14 Td
+(- Busca vagas ordenadas por numero.) Tj
+0 -14 Td
+(- Monta contadores: total, livres e ocupadas.) Tj
+0 -14 Td
+(- Envia dados para vaga/vaga_list.html.) Tj
+0 -14 Td
+(POST:) Tj
+0 -14 Td
+(- Valida quantidade informada.) Tj
+0 -14 Td
+(- Cria vagas faltantes de 1 ate quantidade via get_or_create.) Tj
+0 -14 Td
+(- Nao duplica vagas existentes.) Tj
+0 -14 Td
+(- Exibe mensagem de sucesso e redireciona para vaga_list.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(4\\) VIEW VagaToggleView \\(app/views.py\\)) Tj
+0 -14 Td
+(- Recebe vaga_id pela URL.) Tj
+0 -14 Td
+(- Alterna status: livre <-> ocupada.) Tj
+0 -14 Td
+(- Salva apenas o campo status.) Tj
+0 -14 Td
+(- Exibe mensagem usando get_status_display\\(\\).) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(5\\) VIEW VagaDeleteView \\(app/views.py\\)) Tj
+0 -14 Td
+(GET:) Tj
+0 -14 Td
+(- Exibe tela de confirmacao da exclusao.) Tj
+0 -14 Td
+(POST:) Tj
+0 -14 Td
+(- Antes de excluir, verifica se existe Ticket ligado a vaga.) Tj
+0 -14 Td
+(- Se houver Ticket: bloqueia exclusao e mostra erro.) Tj
+0 -14 Td
+(- Se nao houver: exclui e retorna para lista.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(6\\) URLS DE VAGAS \\(app/urls.py\\)) Tj
+0 -14 Td
+(- /vagas/ -> vaga_list) Tj
+0 -14 Td
+(- /vagas/<id>/alternar/ -> vaga_toggle) Tj
+0 -14 Td
+(- /vagas/<id>/excluir/ -> vaga_delete) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(7\\) TEMPLATE vaga_list.html) Tj
+0 -14 Td
+(- Mostra grade de mini-retangulos por vaga.) Tj
+0 -14 Td
+(- Cada retangulo envia POST para alternar status.) Tj
+0 -14 Td
+(- Cores representam estado: livre \\(verde\\), ocupada \\(vermelho\\).) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(8\\) FLUXO COMPLETO) Tj
+0 -14 Td
+(- Usuario informa quantidade total.) Tj
+0 -14 Td
+(- Sistema cria vagas faltantes automaticamente.) Tj
+0 -14 Td
+(- Usuario clica na vaga para alternar ocupacao.) Tj
+0 -14 Td
+(- Sistema impede excluir vaga com ticket vinculado.) Tj
+0 -14 Td
+() Tj
+0 -14 Td
+(Resumo: o modulo de vagas usa um CRUD simplificado com foco operacional,) Tj
+0 -14 Td
+(com criacao em lote e alteracao de status por clique, sem formulario de edicao tradicional.) Tj
+0 -14 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003062 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3132
+%%EOF
