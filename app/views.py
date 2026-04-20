@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from .models import *
-from .forms import ClienteForm, VeiculoForm
+from .forms import ClienteForm, TarifaForm, VeiculoForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -89,6 +89,64 @@ class ClienteDeleteView(LoginRequiredMixin, View):
 
         messages.success(request, 'Cliente excluido com sucesso.')
         return redirect('cliente_list')
+
+
+class TarifaCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = TarifaForm()
+        return render(request, 'tarifa/tarifa_form.html', {'form': form, 'is_edit': False})
+
+    def post(self, request):
+        form = TarifaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tarifa cadastrada com sucesso.')
+            return redirect('tarifa_create')
+
+        messages.error(request, 'Corrija os campos destacados e tente novamente.')
+        return render(request, 'tarifa/tarifa_form.html', {'form': form, 'is_edit': False}, status=400)
+
+
+class TarifaListView(LoginRequiredMixin, View):
+    def get(self, request):
+        tarifas = Tarifa.objects.all().order_by('hora_inicio', 'tipo_veiculo', 'descricao')
+        return render(request, 'tarifa/tarifa_list.html', {'tarifas': tarifas})
+
+
+class TarifaUpdateView(LoginRequiredMixin, View):
+    def get(self, request, tarifa_id):
+        tarifa = get_object_or_404(Tarifa, id=tarifa_id)
+        form = TarifaForm(instance=tarifa)
+        context = {'form': form, 'tarifa': tarifa, 'is_edit': True}
+        return render(request, 'tarifa/tarifa_form.html', context)
+
+    def post(self, request, tarifa_id):
+        tarifa = get_object_or_404(Tarifa, id=tarifa_id)
+        form = TarifaForm(request.POST, instance=tarifa)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tarifa atualizada com sucesso.')
+            return redirect('tarifa_list')
+
+        messages.error(request, 'Corrija os campos destacados e tente novamente.')
+        context = {'form': form, 'tarifa': tarifa, 'is_edit': True}
+        return render(request, 'tarifa/tarifa_form.html', context, status=400)
+
+
+class TarifaDeleteView(LoginRequiredMixin, View):
+    def get(self, request, tarifa_id):
+        tarifa = get_object_or_404(Tarifa, id=tarifa_id)
+        return render(request, 'tarifa/tarifa_confirm_delete.html', {'tarifa': tarifa})
+
+    def post(self, request, tarifa_id):
+        tarifa = get_object_or_404(Tarifa, id=tarifa_id)
+        if Pagamento.objects.filter(tarifa=tarifa).exists():
+            messages.error(request, 'Nao foi possivel excluir esta tarifa porque ela ja foi usada em pagamentos.')
+            return redirect('tarifa_list')
+
+        tarifa.delete()
+        messages.success(request, 'Tarifa excluida com sucesso.')
+        return redirect('tarifa_list')
 
 
 class VeiculoCreateView(LoginRequiredMixin, View):

@@ -2,7 +2,7 @@ import re
 
 from django import forms
 
-from .models import Cliente, Veiculo
+from .models import Cliente, Tarifa, Veiculo
 
 
 class ClienteForm(forms.ModelForm):
@@ -68,3 +68,52 @@ class VeiculoForm(forms.ModelForm):
     def clean_cor(self):
         cor = self.cleaned_data.get("cor", "")
         return cor.strip() or None
+
+
+class TarifaForm(forms.ModelForm):
+    class Meta:
+        model = Tarifa
+        fields = ["descricao", "tipo_veiculo", "hora_inicio", "hora_fim", "valor_hora", "valor_diaria"]
+        labels = {
+            "descricao": "Descrição",
+            "tipo_veiculo": "Tipo de Veículo",
+            "hora_inicio": "Hora Início",
+            "hora_fim": "Hora Fim",
+            "valor_hora": "Valor por Hora",
+            "valor_diaria": "Valor Diário",
+        }
+        widgets = {
+            "descricao": forms.TextInput(attrs={"placeholder": "tarifa padrão"}),
+            "tipo_veiculo": forms.Select(),
+            "hora_inicio": forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
+            "hora_fim": forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
+            "valor_hora": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+            "valor_diaria": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo_veiculo = cleaned_data.get("tipo_veiculo")
+        hora_inicio = cleaned_data.get("hora_inicio")
+        hora_fim = cleaned_data.get("hora_fim")
+
+        if not tipo_veiculo or not hora_inicio or not hora_fim:
+            return cleaned_data
+
+        tarifas = Tarifa.objects.exclude(pk=self.instance.pk)
+        if tipo_veiculo == "todos":
+            tarifas = tarifas.filter(
+                hora_inicio__lt=hora_fim,
+                hora_fim__gt=hora_inicio,
+            )
+        else:
+            tarifas = tarifas.filter(
+                hora_inicio__lt=hora_fim,
+                hora_fim__gt=hora_inicio,
+                tipo_veiculo__in=[tipo_veiculo, "todos"],
+            )
+
+        if tarifas.exists():
+            raise forms.ValidationError("Ja existe uma tarifa que conflita com essa faixa de horário para o tipo de veículo informado.")
+
+        return cleaned_data

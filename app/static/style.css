@@ -363,6 +363,8 @@ label {
 
 input[type="text"],
 input[type="email"],
+input[type="number"],
+input[type="time"],
 input[type="password"] {
   width: 100%;
   background: var(--bg3);
@@ -655,6 +657,8 @@ label .required {
 
 input[type="text"],
 input[type="email"],
+input[type="number"],
+input[type="time"],
 select,
 textarea {
   width: 100%;

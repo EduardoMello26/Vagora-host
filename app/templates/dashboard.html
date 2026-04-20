@@ -26,6 +26,7 @@
       <a href="{% url 'dashboard' %}" class="app-nav-link active">dashboard</a>
       <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
+      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -56,6 +57,12 @@
         <div class="feature-title">Cadastro de veículos</div>
         <p class="feature-desc">Vincule placas aos clientes e mantenha os veículos prontos para entrada e controle.</p>
         <a href="{% url 'veiculo_list' %}" class="btn-secondary">gerenciar veículos</a>
+      </article>
+
+      <article class="dashboard-card reveal visible">
+        <div class="feature-title">Tarifas por horário</div>
+        <p class="feature-desc">Ajuste os valores por hora de acordo com cada faixa de horário para cálculo do ticket.</p>
+        <a href="{% url 'tarifa_list' %}" class="btn-secondary">gerenciar tarifas</a>
       </article>
 
       <article class="dashboard-card reveal visible">

@@ -95,14 +95,38 @@ class Tarifa(models.Model):
     valor_hora = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Valor por Hora")
     valor_diaria = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name="Valor Diário")
     tipo_veiculo = models.CharField(max_length=5, choices=TIPO_VEICULO_CHOICES, default="todos", verbose_name="Tipo de Veículo")
+    hora_inicio = models.TimeField(verbose_name="Hora Início")
+    hora_fim = models.TimeField(verbose_name="Hora Fim")
 
     class Meta:
         db_table = "tarifa"
         verbose_name = "Tarifa"
         verbose_name_plural = "Tarifas"
+        ordering = ["hora_inicio", "tipo_veiculo", "descricao"]
+
+    def clean(self):
+        super().clean()
+        if self.hora_inicio and self.hora_fim and self.hora_inicio >= self.hora_fim:
+            raise ValidationError({"hora_fim": "A hora final deve ser maior que a hora inicial."})
 
     def __str__(self):
-        return f"{self.descricao} ({self.tipo_veiculo})"
+        return f"{self.descricao} ({self.tipo_veiculo}) - {self.hora_inicio.strftime('%H:%M')} às {self.hora_fim.strftime('%H:%M')}"
+
+    @classmethod
+    def obter_tarifa_por_horario(cls, tipo_veiculo, horario):
+        hora_referencia = getattr(horario, "time", lambda: horario)()
+        candidatas = cls.objects.filter(
+            hora_inicio__lte=hora_referencia,
+            hora_fim__gt=hora_referencia,
+            tipo_veiculo__in=[tipo_veiculo, "todos"],
+        ).annotate(
+            prioridade_tipo=models.Case(
+                models.When(tipo_veiculo=tipo_veiculo, then=models.Value(0)),
+                default=models.Value(1),
+                output_field=models.IntegerField(),
+            )
+        ).order_by("prioridade_tipo", "hora_inicio")
+        return candidatas.first()
 
 
 class Ticket(models.Model):
