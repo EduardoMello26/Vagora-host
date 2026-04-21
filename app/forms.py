@@ -2,7 +2,7 @@ import re
 
 from django import forms
 
-from .models import Avaria, Cliente, Tarifa, Veiculo
+from .models import Avaria, Cliente, Tarifa, Vaga, Veiculo
 
 
 class ClienteForm(forms.ModelForm):
@@ -135,3 +135,39 @@ class AvariaForm(forms.ModelForm):
 
 class VagaQuantidadeForm(forms.Form):
     quantidade = forms.IntegerField(min_value=1, max_value=500, label="Quantidade de vagas")
+
+
+class TicketEmissaoForm(forms.Form):
+    vaga = forms.ModelChoiceField(
+        queryset=Vaga.objects.none(),
+        label="Vaga",
+        empty_label="Selecione uma vaga",
+    )
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.none(),
+        label="Cliente",
+        required=False,
+        empty_label="Nao informar cliente",
+    )
+    veiculo = forms.ModelChoiceField(
+        queryset=Veiculo.objects.none(),
+        label="Veiculo",
+        required=False,
+        empty_label="Nao informar veiculo",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["vaga"].queryset = Vaga.objects.filter(status="livre").order_by("numero")
+        self.fields["cliente"].queryset = Cliente.objects.all().order_by("nome")
+        self.fields["veiculo"].queryset = Veiculo.objects.select_related("cliente").all().order_by("placa")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cliente = cleaned_data.get("cliente")
+        veiculo = cleaned_data.get("veiculo")
+
+        if cliente and veiculo and veiculo.cliente_id and veiculo.cliente_id != cliente.id:
+            raise forms.ValidationError("O veiculo selecionado nao pertence ao cliente informado.")
+
+        return cleaned_data

@@ -1,12 +1,57 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from django.db import transaction
+from django.http import HttpResponse
 from .models import *
-from .forms import AvariaForm, ClienteForm, TarifaForm, VagaQuantidadeForm, VeiculoForm
+from .forms import AvariaForm, ClienteForm, TarifaForm, TicketEmissaoForm, VagaQuantidadeForm, VeiculoForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+def _escape_pdf_text(value):
+    safe_value = str(value)
+    safe_value = safe_value.replace("\\", "\\\\")
+    safe_value = safe_value.replace("(", "\\(")
+    safe_value = safe_value.replace(")", "\\)")
+    return safe_value
+
+
+def _build_simple_pdf(lines):
+    content = ["BT", "/F1 11 Tf", "50 800 Td"]
+    for line in lines:
+        content.append(f"({_escape_pdf_text(line)}) Tj")
+        content.append("0 -14 Td")
+    content.append("ET")
+
+    stream = "\n".join(content)
+    stream_bytes_length = len(stream.encode("ascii", errors="ignore"))
+
+    obj1 = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"
+    obj2 = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n"
+    obj3 = "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n"
+    obj4 = f"4 0 obj\n<< /Length {stream_bytes_length} >>\nstream\n{stream}\nendstream\nendobj\n"
+    obj5 = "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n"
+
+    header = "%PDF-1.4\n"
+    objects = [obj1, obj2, obj3, obj4, obj5]
+    offsets = []
+    current = len(header.encode("ascii"))
+    body = ""
+
+    for obj in objects:
+        offsets.append(current)
+        body += obj
+        current += len(obj.encode("ascii"))
+
+    xref_offset = len((header + body).encode("ascii"))
+    xref = "xref\n0 6\n0000000000 65535 f \n"
+    for offset in offsets:
+        xref += f"{offset:010d} 00000 n \n"
+
+    trailer = f"trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF"
+    return (header + body + xref + trailer).encode("ascii")
 
 class IndexView(View):
     def get(self, request):
@@ -202,6 +247,77 @@ class VeiculoDeleteView(LoginRequiredMixin, View):
         veiculo.delete()
         messages.success(request, 'Veículo excluído com sucesso.')
         return redirect('veiculo_list')
+
+
+class TicketCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = TicketEmissaoForm()
+        return render(request, 'ticket/ticket_form.html', {'form': form})
+
+    def post(self, request):
+        form = TicketEmissaoForm(request.POST)
+        if not form.is_valid():
+            messages.error(request, 'Corrija os campos destacados para emitir o ticket.')
+            return render(request, 'ticket/ticket_form.html', {'form': form}, status=400)
+
+        vaga_escolhida = form.cleaned_data['vaga']
+        cliente = form.cleaned_data.get('cliente')
+        veiculo = form.cleaned_data.get('veiculo')
+
+        if cliente is None and veiculo and veiculo.cliente_id:
+            cliente = veiculo.cliente
+
+        with transaction.atomic():
+            vaga = Vaga.objects.select_for_update().get(pk=vaga_escolhida.pk)
+            if vaga.status != 'livre':
+                messages.error(request, f'A vaga {vaga.numero} nao esta livre no momento.')
+                return redirect('ticket_create')
+
+            ticket = Ticket.objects.create(
+                vaga=vaga,
+                operador=request.user,
+                cliente=cliente,
+                veiculo=veiculo,
+                status='aberto',
+            )
+            vaga.status = 'ocupada'
+            vaga.save(update_fields=['status'])
+
+        messages.success(request, f'Ticket {ticket.id} emitido com sucesso.')
+        return redirect('ticket_pdf', ticket_id=ticket.id)
+
+
+class TicketListView(LoginRequiredMixin, View):
+    def get(self, request):
+        tickets = Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente').all().order_by('-entrada')
+        return render(request, 'ticket/ticket_list.html', {'tickets': tickets})
+
+
+class TicketPdfView(LoginRequiredMixin, View):
+    def get(self, request, ticket_id):
+        ticket = get_object_or_404(
+            Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente'),
+            id=ticket_id,
+        )
+
+        lines = [
+            'TICKET DE AGENDAMENTO DE VAGA',
+            '',
+            f'Ticket: {ticket.id}',
+            f'Vaga: {ticket.vaga.numero}',
+            f'Entrada: {ticket.entrada.strftime("%d/%m/%Y %H:%M:%S")}',
+            f'Status: {ticket.get_status_display()}',
+            f'Operador: {ticket.operador.get_username()}',
+            f'Veiculo: {ticket.veiculo.placa if ticket.veiculo_id else "Nao informado"}',
+            f'Cliente: {ticket.cliente.nome if ticket.cliente_id else "Nao informado"}',
+            '',
+            'Comprovante para impressao.',
+        ]
+
+        pdf_bytes = _build_simple_pdf(lines)
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="ticket_{ticket.id}.pdf"'
+        return response
 
 
 class VagaListView(LoginRequiredMixin, View):

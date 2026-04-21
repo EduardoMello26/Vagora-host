@@ -117,10 +117,10 @@ class Ticket(models.Model):
         ("cancelado", "Cancelado"),
     ]
 
-    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, verbose_name="Veículo")
+    veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Veículo")
     vaga = models.ForeignKey(Vaga, on_delete=models.CASCADE, verbose_name="Vaga")
     operador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Operador")
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, verbose_name="Cliente")
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Cliente")
     entrada = models.DateTimeField(auto_now_add=True, verbose_name="Entrada")
     saida = models.DateTimeField(null=True, blank=True, verbose_name="Saída")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="aberto", verbose_name="Status")
@@ -137,7 +137,8 @@ class Ticket(models.Model):
                 raise ValidationError({"cliente": "O cliente do ticket deve ser o mesmo cliente do veículo."})
 
     def __str__(self):
-        return f"Ticket {self.id} - {self.veiculo.placa} ({self.status})"
+        placa = self.veiculo.placa if self.veiculo_id else "sem veiculo"
+        return f"Ticket {self.id} - {placa} ({self.status})"
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -169,6 +170,14 @@ class Pagamento(models.Model):
 
     def __str__(self):
         return f"Pagamento {self.id} - {self.ticket}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.ticket.status != "finalizado":
+            self.ticket.status = "finalizado"
+            if self.ticket.saida is None:
+                self.ticket.saida = self.pago_em
+            self.ticket.save(update_fields=["status", "saida"])
 
 
 class Avaria(models.Model):

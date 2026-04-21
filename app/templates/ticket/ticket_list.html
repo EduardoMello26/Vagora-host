@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vagora - Lista de avarias</title>
+  <title>Vagora - Tickets</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
@@ -23,9 +23,9 @@
       <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
       <a href="{% url 'vaga_list' %}" class="app-nav-link">vagas</a>
-      <a href="{% url 'ticket_list' %}" class="app-nav-link">tickets</a>
+      <a href="{% url 'ticket_list' %}" class="app-nav-link active">tickets</a>
       <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
-      <a href="{% url 'avaria_list' %}" class="app-nav-link active">avarias</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -39,10 +39,10 @@
 
   <main class="dashboard-main">
     <section class="dashboard-welcome">
-      <div class="hero-tag">avarias</div>
-      <h1>Lista de <span>avarias</span></h1>
-      <p class="hero-desc">Visualize e gerencie as ocorrências registradas por veículo.</p>
-      <a href="{% url 'avaria_create' %}" class="btn-primary">&#9654; nova avaria</a>
+      <div class="hero-tag">tickets</div>
+      <h1>Tickets <span>emitidos</span></h1>
+      <p class="hero-desc">Cada ticket confirma o agendamento da vaga e pode ser impresso em PDF.</p>
+      <a href="{% url 'ticket_create' %}" class="btn-primary">&#9654; novo ticket</a>
     </section>
 
     {% if messages %}
@@ -54,30 +54,31 @@
     {% endif %}
 
     <section class="client-list-wrap">
-      <div class="client-list-header">
-        <span>veículo</span>
+      <div class="client-list-header" style="grid-template-columns: 80px 90px 180px 120px 110px 140px;">
+        <span>id</span>
+        <span>vaga</span>
+        <span>entrada</span>
+        <span>status</span>
         <span>operador</span>
-        <span>descrição</span>
-        <span>data</span>
-        <span>ações</span>
+        <span>acoes</span>
       </div>
 
-      {% for avaria in avarias %}
-        <article class="client-row">
-          <span>{{ avaria.veiculo }}</span>
-          <span>{{ avaria.operador }}</span>
-          <span>{{ avaria.descricao|truncatechars:60 }}</span>
-          <span>{{ avaria.registrado_em|date:'d/m/Y H:i' }}</span>
-          <span style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="{% url 'avaria_edit' avaria.id %}" class="btn-secondary">editar</a>
-            <a href="{% url 'avaria_delete' avaria.id %}" class="btn-secondary">excluir</a>
+      {% for ticket in tickets %}
+        <article class="client-row" style="grid-template-columns: 80px 90px 180px 120px 110px 140px;">
+          <span>#{{ ticket.id }}</span>
+          <span>{{ ticket.vaga.numero }}</span>
+          <span>{{ ticket.entrada|date:'d/m/Y H:i' }}</span>
+          <span>{{ ticket.get_status_display }}</span>
+          <span>{{ ticket.operador.username }}</span>
+          <span>
+            <a href="{% url 'ticket_pdf' ticket.id %}" class="btn-secondary" target="_blank" rel="noopener">pdf</a>
           </span>
         </article>
       {% empty %}
         <article class="dashboard-card">
-          <div class="feature-title">Nenhuma avaria registrada</div>
-          <p class="feature-desc">Registre a primeira ocorrência para acompanhar os danos por veículo.</p>
-          <a href="{% url 'avaria_create' %}" class="btn-secondary">registrar avaria</a>
+          <div class="feature-title">Nenhum ticket emitido</div>
+          <p class="feature-desc">Emita o primeiro ticket para reservar uma vaga e gerar o comprovante.</p>
+          <a href="{% url 'ticket_create' %}" class="btn-secondary">emitir ticket</a>
         </article>
       {% endfor %}
     </section>

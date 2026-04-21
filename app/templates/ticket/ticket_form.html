@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vagora - {% if is_edit %}Editar avaria{% else %}Registrar avaria{% endif %}</title>
+  <title>Vagora - Emitir ticket</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
@@ -23,9 +23,9 @@
       <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
       <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
       <a href="{% url 'vaga_list' %}" class="app-nav-link">vagas</a>
-      <a href="{% url 'ticket_list' %}" class="app-nav-link">tickets</a>
+      <a href="{% url 'ticket_list' %}" class="app-nav-link active">tickets</a>
       <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
-      <a href="{% url 'avaria_list' %}" class="app-nav-link active">avarias</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
       <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
     </div>
 
@@ -44,31 +44,34 @@
       <div class="corner corner-bl"></div>
       <div class="corner corner-br"></div>
 
-      <div class="card-tag">{% if is_edit %}edicao{% else %}cadastro{% endif %}</div>
-      <div class="card-title">{% if is_edit %}Editar avaria{% else %}Nova avaria{% endif %}</div>
-      <p class="card-sub">
-        Registre a ocorrência vinculando o veículo atingido. O operador logado será salvo automaticamente.
-      </p>
-
-      <p style="margin-bottom: 20px;">
-        <a href="{% url 'avaria_list' %}" class="btn-secondary">ver lista de avarias</a>
-      </p>
+      <div class="card-tag">ticket</div>
+      <h1 class="card-title">Emitir <span>ticket</span></h1>
+      <p class="card-sub">Selecione a vaga e, se desejar, informe cliente e veiculo para registrar o agendamento completo.</p>
 
       {% if messages %}
-        {% for message in messages %}
-          <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
-        {% endfor %}
+        <div style="margin: 0 0 14px 0; display: grid; gap: 10px;">
+          {% for message in messages %}
+            <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+          {% endfor %}
+        </div>
       {% endif %}
 
-      {% if form.non_field_errors %}
-        <div class="form-feedback error">{{ form.non_field_errors }}</div>
-      {% endif %}
-
-      <form method="post" action="{% if is_edit %}{% url 'avaria_edit' avaria.id %}{% else %}{% url 'avaria_create' %}{% endif %}">
+      <form method="post" novalidate>
         {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="form-feedback error">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
 
         <div class="form-group">
-          <label for="id_veiculo">Veículo <span class="required">*</span></label>
+          <label for="id_cliente">Cliente</label>
+          {{ form.cliente }}
+          {% if form.cliente.errors %}
+            <div class="form-feedback error">{{ form.cliente.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_veiculo">Veículo</label>
           {{ form.veiculo }}
           {% if form.veiculo.errors %}
             <div class="form-feedback error">{{ form.veiculo.errors|striptags }}</div>
@@ -76,14 +79,17 @@
         </div>
 
         <div class="form-group">
-          <label for="id_descricao">Descrição <span class="required">*</span></label>
-          {{ form.descricao }}
-          {% if form.descricao.errors %}
-            <div class="form-feedback error">{{ form.descricao.errors|striptags }}</div>
+          <label for="id_vaga">Vaga</label>
+          {{ form.vaga }}
+          {% if form.vaga.errors %}
+            <div class="form-feedback error">{{ form.vaga.errors|striptags }}</div>
           {% endif %}
         </div>
 
-        <button type="submit" class="btn-submit">&#9654; {% if is_edit %}atualizar avaria{% else %}salvar avaria{% endif %}</button>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px;">
+          <button type="submit" class="btn-submit">&#9654; emitir ticket</button>
+          <a href="{% url 'ticket_list' %}" class="btn-secondary">ver tickets</a>
+        </div>
       </form>
     </div>
   </div>
