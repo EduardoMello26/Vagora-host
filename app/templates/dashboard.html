@@ -44,8 +44,7 @@
       <div class="hero-tag">painel operacional</div>
       <h1>Bem-vindo, <span>{{ request.user.username }}</span></h1>
       <p class="hero-desc">
-        Acesse rapidamente os fluxos principais de cadastro e atendimento. Este painel segue o mesmo padrao visual das
-        telas de login e contato.
+        Acesse rapidamente os fluxos principais do sistema.
       </p>
     </section>
 
@@ -53,7 +52,7 @@
       <article class="dashboard-card reveal visible">
         <div class="feature-title">Cadastro de clientes</div>
         <p class="feature-desc">Registre cliente avulso ou mensalista para liberar abertura de ticket sem friccao.</p>
-        <a href="{% url 'cliente_create' %}" class="btn-secondary">abrir cadastro</a>
+        <a href="{% url 'cliente_list' %}" class="btn-secondary">gerenciar cadastro</a>
       </article>
 
       <article class="dashboard-card reveal visible">
@@ -71,7 +70,7 @@
       <article class="dashboard-card reveal visible">
         <div class="feature-title">Tickets de agendamento</div>
         <p class="feature-desc">Emita ticket com a vaga selecionada e gere o comprovante em PDF para impressao.</p>
-        <a href="{% url 'ticket_create' %}" class="btn-secondary">emitir ticket</a>
+        <a href="{% url 'ticket_list' %}" class="btn-secondary">gerenciar ticket</a>
       </article>
 
       <article class="dashboard-card reveal visible">
