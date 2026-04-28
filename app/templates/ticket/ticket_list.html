@@ -53,24 +53,44 @@
       </section>
     {% endif %}
 
+    {% if pdf_ticket_url %}
+      <a id="ticket-pdf-link" href="{{ pdf_ticket_url }}" target="_blank" rel="noopener" style="display:none;">abrir pdf</a>
+    {% endif %}
+
     <section class="client-list-wrap">
       <div class="client-list-header" style="grid-template-columns: 80px 90px 180px 120px 110px 140px;">
         <span>id</span>
         <span>vaga</span>
         <span>entrada</span>
+        <span>saida</span>
         <span>status</span>
         <span>operador</span>
         <span>acoes</span>
       </div>
 
       {% for ticket in tickets %}
-        <article class="client-row" style="grid-template-columns: 80px 90px 180px 120px 110px 140px;">
+        <article class="client-row" style="grid-template-columns: 80px 90px 180px 150px 120px 110px 140px;">
           <span>#{{ ticket.id }}</span>
           <span>{{ ticket.vaga.numero }}</span>
           <span>{{ ticket.entrada|date:'d/m/Y H:i' }}</span>
-          <span>{{ ticket.get_status_display }}</span>
-          <span>{{ ticket.operador.username }}</span>
           <span>
+            {% if ticket.saida %}
+              {{ ticket.saida|date:'d/m/Y H:i' }}
+            {% else %}
+              -
+            {% endif %}
+          </span>
+          <span>
+            {{ ticket.get_status_display }}
+            {% if ticket.status == 'finalizado' %}
+              <small style="display:block; color: var(--muted);">R$ {{ ticket.pagamento.valor_total }}</small>
+            {% endif %}
+          </span>
+          <span>{{ ticket.operador.username }}</span>
+          <span style="display:flex; gap:10px; flex-wrap:wrap;">
+            {% if ticket.status == 'aberto' %}
+              <a href="{% url 'pagamento_create' ticket.id %}" class="btn-primary">pagar</a>
+            {% endif %}
             <a href="{% url 'ticket_pdf' ticket.id %}" class="btn-secondary" target="_blank" rel="noopener">pdf</a>
           </span>
         </article>
@@ -85,6 +105,11 @@
   </main>
 
   <script>
+    const pdfTicketUrl = "{{ pdf_ticket_url|default:''|escapejs }}";
+    if (pdfTicketUrl) {
+      window.open(pdfTicketUrl, '_blank', 'noopener');
+    }
+
     setTimeout(() => {
       document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
         messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from decimal import Decimal, ROUND_CEILING
 
 
 class Cliente(models.Model):
@@ -170,6 +171,22 @@ class Pagamento(models.Model):
 
     def __str__(self):
         return f"Pagamento {self.id} - {self.ticket}"
+
+    @staticmethod
+    def calcular_valor(ticket, tarifa, saida):
+        duracao = saida - ticket.entrada
+        horas_decimais = Decimal(str(duracao.total_seconds())) / Decimal("3600")
+        horas_cobradas = int(horas_decimais.to_integral_value(rounding=ROUND_CEILING))
+        horas_cobradas = max(horas_cobradas, 1)
+
+        if tarifa.valor_diaria and horas_cobradas >= 24:
+            dias = horas_cobradas // 24
+            horas_restantes = horas_cobradas % 24
+            total = (Decimal(dias) * tarifa.valor_diaria) + (Decimal(horas_restantes) * tarifa.valor_hora)
+        else:
+            total = Decimal(horas_cobradas) * tarifa.valor_hora
+
+        return total.quantize(Decimal("0.01"))
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

@@ -20,6 +20,7 @@ urlpatterns = [
     path('tickets/novo/', TicketCreateView.as_view(), name='ticket_create'),
     path('tickets/', TicketListView.as_view(), name='ticket_list'),
     path('tickets/<int:ticket_id>/pdf/', TicketPdfView.as_view(), name='ticket_pdf'),
+    path('pagamentos/<int:ticket_id>/novo/', PagamentoCreateView.as_view(), name='pagamento_create'),
     path('vagas/', VagaListView.as_view(), name='vaga_list'),
     path('vagas/<int:vaga_id>/alternar/', VagaToggleView.as_view(), name='vaga_toggle'),
     path('vagas/<int:vaga_id>/excluir/', VagaDeleteView.as_view(), name='vaga_delete'),

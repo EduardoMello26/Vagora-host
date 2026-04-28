@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagora - Pagamento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav class="app-nav">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      vagora
+    </div>
+
+    <div class="app-nav-links">
+      <a href="{% url 'dashboard' %}" class="app-nav-link">dashboard</a>
+      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
+      <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
+      <a href="{% url 'vaga_list' %}" class="app-nav-link">vagas</a>
+      <a href="{% url 'ticket_list' %}" class="app-nav-link active">tickets</a>
+      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
+      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
+      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
+    </div>
+
+    <div class="app-nav-actions">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-nav-logout">sair</button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="contact-wrapper">
+    <div class="contact-card">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <div class="card-tag">pagamento</div>
+      <h1 class="card-title">Fechar <span>ticket</span></h1>
+      <p class="card-sub">Confirme a tarifa e a forma de pagamento. O ticket será finalizado automaticamente ao salvar.</p>
+
+      <div class="dashboard-card" style="margin: 18px 0;">
+        <div class="feature-title">Resumo do ticket</div>
+        <p class="feature-desc">Ticket #{{ ticket.id }} | Vaga {{ ticket.vaga.numero }} | Entrada {{ ticket.entrada|date:'d/m/Y H:i' }}</p>
+        <p class="feature-desc">Cliente: {{ ticket.cliente|default:'Nao informado' }}</p>
+        <p class="feature-desc">Veículo: {{ ticket.veiculo|default:'Nao informado' }}</p>
+      </div>
+
+      {% if messages %}
+        <div style="margin: 0 0 14px 0; display: grid; gap: 10px;">
+          {% for message in messages %}
+            <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        <div class="form-feedback error">{{ form.non_field_errors|striptags }}</div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="id_tarifa">Tarifa</label>
+          {{ form.tarifa }}
+          {% if form.tarifa.errors %}
+            <div class="form-feedback error">{{ form.tarifa.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_forma_pagamento">Forma de Pagamento</label>
+          {{ form.forma_pagamento }}
+          {% if form.forma_pagamento.errors %}
+            <div class="form-feedback error">{{ form.forma_pagamento.errors|striptags }}</div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px;">
+          <button type="submit" class="btn-submit">&#9654; confirmar pagamento</button>
+          <a href="{% url 'ticket_list' %}" class="btn-secondary">cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.auto-hide-message').forEach((messageElement) => {
+        messageElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(-6px)';
+        setTimeout(() => messageElement.remove(), 300);
+      });
+    }, 3000);
+  </script>
+</body>
+</html>

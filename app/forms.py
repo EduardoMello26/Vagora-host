@@ -1,8 +1,9 @@
 import re
 
 from django import forms
+from django.utils import timezone
 
-from .models import Avaria, Cliente, Tarifa, Vaga, Veiculo
+from .models import Avaria, Cliente, Pagamento, Tarifa, Ticket, Vaga, Veiculo
 
 
 class ClienteForm(forms.ModelForm):
@@ -171,3 +172,32 @@ class TicketEmissaoForm(forms.Form):
             raise forms.ValidationError("O veiculo selecionado nao pertence ao cliente informado.")
 
         return cleaned_data
+
+
+class PagamentoForm(forms.ModelForm):
+    class Meta:
+        model = Pagamento
+        fields = ["tarifa", "forma_pagamento"]
+        labels = {
+            "tarifa": "Tarifa",
+            "forma_pagamento": "Forma de Pagamento",
+        }
+        widgets = {
+            "tarifa": forms.Select(),
+            "forma_pagamento": forms.Select(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        agora = timezone.localtime(timezone.now()).time()
+        tarifas_ativas = Tarifa.objects.filter(hora_inicio__lte=agora, hora_fim__gt=agora).order_by("tipo_veiculo", "descricao")
+        self.fields["tarifa"].queryset = tarifas_ativas
+
+    def clean_tarifa(self):
+        tarifa = self.cleaned_data["tarifa"]
+        agora = timezone.localtime(timezone.now()).time()
+
+        if not Tarifa.objects.filter(pk=tarifa.pk, hora_inicio__lte=agora, hora_fim__gt=agora).exists():
+            raise forms.ValidationError("A tarifa selecionada nao esta ativa neste horario.")
+
+        return tarifa

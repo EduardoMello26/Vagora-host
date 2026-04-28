@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from django.db import transaction
 from django.http import HttpResponse
+from django.urls import reverse
+from django.utils import timezone
 from .models import *
-from .forms import AvariaForm, ClienteForm, TarifaForm, TicketEmissaoForm, VagaQuantidadeForm, VeiculoForm
+from .forms import AvariaForm, ClienteForm, PagamentoForm, TarifaForm, TicketEmissaoForm, VagaQuantidadeForm, VeiculoForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -284,13 +286,23 @@ class TicketCreateView(LoginRequiredMixin, View):
             vaga.save(update_fields=['status'])
 
         messages.success(request, f'Ticket {ticket.id} emitido com sucesso.')
-        return redirect('ticket_pdf', ticket_id=ticket.id)
+        return redirect(f"{reverse('ticket_list')}?pdf_ticket_id={ticket.id}")
 
 
 class TicketListView(LoginRequiredMixin, View):
     def get(self, request):
-        tickets = Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente').all().order_by('-entrada')
-        return render(request, 'ticket/ticket_list.html', {'tickets': tickets})
+        tickets = Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente', 'pagamento').all().order_by('-entrada')
+        pdf_ticket_id = request.GET.get('pdf_ticket_id')
+        pdf_ticket_url = None
+
+        if pdf_ticket_id and str(pdf_ticket_id).isdigit():
+            try:
+                ticket = Ticket.objects.get(pk=int(pdf_ticket_id))
+                pdf_ticket_url = reverse('ticket_pdf', kwargs={'ticket_id': ticket.id})
+            except Ticket.DoesNotExist:
+                pdf_ticket_url = None
+
+        return render(request, 'ticket/ticket_list.html', {'tickets': tickets, 'pdf_ticket_url': pdf_ticket_url})
 
 
 class TicketPdfView(LoginRequiredMixin, View):
@@ -306,6 +318,7 @@ class TicketPdfView(LoginRequiredMixin, View):
             f'Ticket: {ticket.id}',
             f'Vaga: {ticket.vaga.numero}',
             f'Entrada: {ticket.entrada.strftime("%d/%m/%Y %H:%M:%S")}',
+            f'Saida: {ticket.saida.strftime("%d/%m/%Y %H:%M:%S") if ticket.saida else "Em aberto"}',
             f'Status: {ticket.get_status_display()}',
             f'Operador: {ticket.operador.get_username()}',
             f'Veiculo: {ticket.veiculo.placa if ticket.veiculo_id else "Nao informado"}',
@@ -318,6 +331,67 @@ class TicketPdfView(LoginRequiredMixin, View):
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
         response['Content-Disposition'] = f'inline; filename="ticket_{ticket.id}.pdf"'
         return response
+
+
+class PagamentoCreateView(LoginRequiredMixin, View):
+    def get(self, request, ticket_id):
+        ticket = get_object_or_404(Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente'), id=ticket_id)
+
+        if ticket.status != 'aberto':
+            messages.error(request, 'Este ticket ja esta finalizado ou cancelado.')
+            return redirect('ticket_list')
+
+        if Pagamento.objects.filter(ticket=ticket).exists():
+            messages.error(request, 'Este ticket ja possui pagamento registrado.')
+            return redirect('ticket_list')
+
+        form = PagamentoForm()
+        if not form.fields['tarifa'].queryset.exists():
+            messages.error(request, 'Nao ha tarifa ativa para este horario. Cadastre ou ajuste uma tarifa antes de pagar.')
+            return redirect('ticket_list')
+
+        return render(request, 'pagamento/pagamento_form.html', {'form': form, 'ticket': ticket})
+
+    def post(self, request, ticket_id):
+        ticket = get_object_or_404(Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente'), id=ticket_id)
+
+        if ticket.status != 'aberto':
+            messages.error(request, 'Este ticket ja esta finalizado ou cancelado.')
+            return redirect('ticket_list')
+
+        if Pagamento.objects.filter(ticket=ticket).exists():
+            messages.error(request, 'Este ticket ja possui pagamento registrado.')
+            return redirect('ticket_list')
+
+        form = PagamentoForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'pagamento/pagamento_form.html', {'form': form, 'ticket': ticket}, status=400)
+
+        tarifa = form.cleaned_data['tarifa']
+        forma_pagamento = form.cleaned_data['forma_pagamento']
+
+        with transaction.atomic():
+            ticket = Ticket.objects.select_for_update().get(pk=ticket.pk)
+            if ticket.status != 'aberto':
+                messages.error(request, 'Este ticket nao esta mais aberto.')
+                return redirect('ticket_list')
+
+            saida = timezone.now()
+            valor_total = Pagamento.calcular_valor(ticket, tarifa, saida)
+
+            ticket.saida = saida
+            ticket.status = 'finalizado'
+            ticket.save(update_fields=['saida', 'status'])
+
+            pagamento = Pagamento.objects.create(
+                ticket=ticket,
+                tarifa=tarifa,
+                valor_total=valor_total,
+                forma_pagamento=forma_pagamento,
+            )
+
+        messages.success(request, f'Pagamento registrado com sucesso. Valor total: R$ {pagamento.valor_total}.')
+        return redirect('ticket_list')
 
 
 class VagaListView(LoginRequiredMixin, View):
