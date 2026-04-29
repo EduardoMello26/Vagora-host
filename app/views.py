@@ -57,9 +57,21 @@ def _build_simple_pdf(lines):
 
 class IndexView(View):
     def get(self, request):
+
+        total_vagas = Vaga.objects.count()
+        vagas_livres = Vaga.objects.filter(status='livre').count()
+        vagas_ocupadas = Vaga.objects.filter(status='ocupada').count()
+
+        context = {
+            'total_vagas': total_vagas,
+            'vagas_livres': vagas_livres,
+            'vagas_ocupadas': vagas_ocupadas,
+        }
+
         if request.user.is_authenticated:
             return redirect('dashboard')
-        return render(request, 'index.html')
+        return render(request, 'index.html', context)
+    
 
     def post(self, request):
         username = request.POST.get('username', '').strip()
@@ -68,8 +80,15 @@ class IndexView(View):
         user = authenticate(request, username=username, password=password)
         if user is None:
             messages.error(request, 'Usuário ou senha inválidos.')
-            return render(request, 'index.html', status=401)
+            
+            context = {
+                'total_vagas': Vaga.objects.count(),
+                'vagas_livres': Vaga.objects.filter(status='livre').count(),
+                'vagas_ocupadas': Vaga.objects.filter(status='ocupada').count(),
+            }
+            return render(request, 'index.html', context, status=401)
 
+            
         login(request, user)
         messages.success(request, 'Login realizado com sucesso.')
         return redirect('dashboard')

@@ -52,16 +52,16 @@
 
       <div class="stats-row">
         <div class="stat">
-          <span class="stat-value green" id="livres">—</span>
-          <span class="stat-label">Vagas livres</span>
+          <span class="stat-value white" id="total">-</span>
+          <span class="stat-label">Total de Vagas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value green" id="livres">-</span>
+          <span class="stat-label">Livres</span>
         </div>
         <div class="stat">
           <span class="stat-value red" id="ocupadas">—</span>
           <span class="stat-label">Ocupadas</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value warn" id="tickets">—</span>
-          <span class="stat-label">Tickets hoje</span>
         </div>
       </div>
 
@@ -148,10 +148,13 @@
 
   <script>
     // Simula dados de vagas (substituir por chamada Django)
+
+
     setTimeout(() => {
-      document.getElementById('livres').textContent = '18';
-      document.getElementById('ocupadas').textContent = '12';
-      document.getElementById('tickets').textContent = '37';
+      document.getElementById('total').textContent = {{ total_vagas }};
+      document.getElementById('livres').textContent = {{ vagas_livres }};
+      document.getElementById('ocupadas').textContent = {{ vagas_ocupadas }};
+
     }, 800);
 
     // Scroll reveal
