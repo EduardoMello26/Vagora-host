@@ -143,7 +143,6 @@ class Ticket(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        # Se o veiculo ainda nao tiver cliente, vincula automaticamente ao cliente do ticket.
         if self.veiculo_id and self.cliente_id and self.veiculo.cliente_id is None:
             self.veiculo.cliente = self.cliente
             self.veiculo.save(update_fields=["cliente"])
@@ -195,6 +194,10 @@ class Pagamento(models.Model):
             if self.ticket.saida is None:
                 self.ticket.saida = self.pago_em
             self.ticket.save(update_fields=["status", "saida"])
+
+        if self.ticket.vaga_id and self.ticket.vaga.status != "livre":
+            self.ticket.vaga.status = "livre"
+            self.ticket.vaga.save(update_fields=["status"])
 
 
 class Avaria(models.Model):
