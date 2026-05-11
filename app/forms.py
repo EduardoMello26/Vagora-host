@@ -201,3 +201,24 @@ class PagamentoForm(forms.ModelForm):
             raise forms.ValidationError("A tarifa selecionada nao esta ativa neste horario.")
 
         return tarifa
+
+
+class RelatorioFinanceiroForm(forms.Form):
+    data_inicio = forms.DateField(
+        label="Data inicial",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    data_fim = forms.DateField(
+        label="Data final",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        data_inicio = cleaned_data.get("data_inicio")
+        data_fim = cleaned_data.get("data_fim")
+
+        if data_inicio and data_fim and data_inicio > data_fim:
+            raise forms.ValidationError("A data inicial nao pode ser maior que a data final.")
+
+        return cleaned_data

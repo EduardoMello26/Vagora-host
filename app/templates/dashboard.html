@@ -16,37 +16,9 @@
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  <nav class="app-nav">
-    <div class="logo">
-      <div class="logo-dot"></div>
-      vagora
-    </div>
-
-    <div class="app-nav-links">
-      <a href="{% url 'dashboard' %}" class="app-nav-link active">dashboard</a>
-      <a href="{% url 'cliente_list' %}" class="app-nav-link">clientes</a>
-      <a href="{% url 'veiculo_list' %}" class="app-nav-link">veículos</a>
-      <a href="{% url 'vaga_list' %}" class="app-nav-link">vagas</a>
-      <a href="{% url 'ticket_list' %}" class="app-nav-link">tickets</a>
-      <a href="{% url 'tarifa_list' %}" class="app-nav-link">tarifas</a>
-      <a href="{% url 'avaria_list' %}" class="app-nav-link">avarias</a>
-      <a href="{% url 'contato' %}" class="app-nav-link">suporte</a>
-    </div>
-
-    <form method="post" action="{% url 'logout' %}" class="app-nav-actions">
-      {% csrf_token %}
-      <button type="submit" class="btn-nav-logout">sair</button>
-    </form>
-  </nav>
+  {% include 'includes/_navbar.html' with nav_active='dashboard' %}
 
   <main class="dashboard-main">
-    <section class="dashboard-welcome">
-      <div class="hero-tag">painel operacional</div>
-      <h1>Bem-vindo, <span>{{ request.user.username }}</span></h1>
-      <p class="hero-desc">
-        Acesse rapidamente os fluxos principais do sistema.
-      </p>
-    </section>
 
     <section class="dashboard-grid">
       <article class="dashboard-card reveal visible">
@@ -71,6 +43,12 @@
         <div class="feature-title">Tickets de agendamento</div>
         <p class="feature-desc">Emita ticket com a vaga selecionada e gere o comprovante em PDF para impressao.</p>
         <a href="{% url 'ticket_list' %}" class="btn-secondary">gerenciar ticket</a>
+      </article>
+
+      <article class="dashboard-card reveal visible">
+        <div class="feature-title">Relatório financeiro</div>
+        <p class="feature-desc">Gere um PDF com a quantidade de tickets, receita total e avarias por intervalo de datas.</p>
+        <a href="{% url 'relatorio_financeiro' %}" class="btn-secondary">abrir relatório</a>
       </article>
 
       <article class="dashboard-card reveal visible">

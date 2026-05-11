@@ -4,8 +4,10 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models import Sum
+from decimal import Decimal
 from .models import *
-from .forms import AvariaForm, ClienteForm, PagamentoForm, TarifaForm, TicketEmissaoForm, VagaQuantidadeForm, VeiculoForm
+from .forms import AvariaForm, ClienteForm, PagamentoForm, RelatorioFinanceiroForm, TarifaForm, TicketEmissaoForm, VagaQuantidadeForm, VeiculoForm
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -54,6 +56,10 @@ def _build_simple_pdf(lines):
 
     trailer = f"trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF"
     return (header + body + xref + trailer).encode("ascii")
+
+
+def _format_decimal(value):
+    return f"{value:.2f}"
 
 class IndexView(View):
     def get(self, request):
@@ -411,6 +417,47 @@ class PagamentoCreateView(LoginRequiredMixin, View):
 
         messages.success(request, f'Pagamento registrado com sucesso. Valor total: R$ {pagamento.valor_total}.')
         return redirect('ticket_list')
+
+
+class RelatorioFinanceiroView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = RelatorioFinanceiroForm()
+        return render(request, 'relatorio/financeiro_form.html', {'form': form})
+
+    def post(self, request):
+        form = RelatorioFinanceiroForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'relatorio/financeiro_form.html', {'form': form}, status=400)
+
+        data_inicio = form.cleaned_data['data_inicio']
+        data_fim = form.cleaned_data['data_fim']
+
+        tickets_queryset = Ticket.objects.filter(entrada__date__range=(data_inicio, data_fim))
+        pagamentos_queryset = Pagamento.objects.filter(pago_em__date__range=(data_inicio, data_fim))
+        avarias_queryset = Avaria.objects.filter(registrado_em__date__range=(data_inicio, data_fim))
+
+        total_recebido = pagamentos_queryset.aggregate(total=Sum('valor_total'))['total'] or Decimal('0.00')
+
+        pdf_lines = [
+            'RELATORIO FINANCEIRO',
+            '',
+            f'Periodo: {data_inicio.strftime("%d/%m/%Y")} a {data_fim.strftime("%d/%m/%Y")}',
+            f'Tickets emitidos: {tickets_queryset.count()}',
+            f'Pagamentos realizados: {pagamentos_queryset.count()}',
+            f'Total recebido: R$ {_format_decimal(total_recebido)}',
+            f'Avarias registradas: {avarias_queryset.count()}',
+            '',
+            'Detalhamento:',
+            f'- Tickets contabilizados pela data de entrada.',
+            f'- Receita contabilizada pela data do pagamento.',
+            f'- Avarias contabilizadas pela data de registro.',
+        ]
+
+        pdf_bytes = _build_simple_pdf(pdf_lines)
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        filename = f'relatorio_financeiro_{data_inicio.strftime("%Y%m%d")}_{data_fim.strftime("%Y%m%d")}.pdf'
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        return response
 
 
 class VagaListView(LoginRequiredMixin, View):

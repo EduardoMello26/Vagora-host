@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vagora - Emitir ticket</title>
+  <title>Vagora - Relatorio financeiro</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
@@ -12,18 +12,16 @@
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
-  {% include 'includes/_navbar.html' with nav_active='tickets' %}
+  {% include 'includes/_navbar.html' with nav_active='relatorio' %}
 
   <div class="contact-wrapper">
     <div class="contact-card">
-      <div class="corner corner-tl"></div>
-      <div class="corner corner-tr"></div>
-      <div class="corner corner-bl"></div>
+
       <div class="corner corner-br"></div>
 
-      <div class="card-tag">ticket</div>
-      <h1 class="card-title">Emitir <span>ticket</span></h1>
-      <p class="card-sub">Selecione a vaga e, se desejar, informe cliente e veiculo para registrar o agendamento completo.</p>
+      <div class="card-tag">relatorio</div>
+      <h1 class="card-title">Relatório <span>financeiro</span></h1>
+      <p class="card-sub">Escolha o intervalo de datas e gere um PDF com tickets, receita e avarias no período.</p>
 
       {% if messages %}
         <div style="margin: 0 0 14px 0; display: grid; gap: 10px;">
@@ -33,39 +31,32 @@
         </div>
       {% endif %}
 
-      <form method="post" novalidate>
+      {% if form.non_field_errors %}
+        <div class="form-feedback error">{{ form.non_field_errors|striptags }}</div>
+      {% endif %}
+
+      <form method="post" target="_blank">
         {% csrf_token %}
-        {% if form.non_field_errors %}
-          <div class="form-feedback error">{{ form.non_field_errors|striptags }}</div>
-        {% endif %}
 
         <div class="form-group">
-          <label for="id_cliente">Cliente</label>
-          {{ form.cliente }}
-          {% if form.cliente.errors %}
-            <div class="form-feedback error">{{ form.cliente.errors|striptags }}</div>
+          <label for="id_data_inicio">Data inicial</label>
+          {{ form.data_inicio }}
+          {% if form.data_inicio.errors %}
+            <div class="form-feedback error">{{ form.data_inicio.errors|striptags }}</div>
           {% endif %}
         </div>
 
         <div class="form-group">
-          <label for="id_veiculo">Veículo</label>
-          {{ form.veiculo }}
-          {% if form.veiculo.errors %}
-            <div class="form-feedback error">{{ form.veiculo.errors|striptags }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="id_vaga">Vaga</label>
-          {{ form.vaga }}
-          {% if form.vaga.errors %}
-            <div class="form-feedback error">{{ form.vaga.errors|striptags }}</div>
+          <label for="id_data_fim">Data final</label>
+          {{ form.data_fim }}
+          {% if form.data_fim.errors %}
+            <div class="form-feedback error">{{ form.data_fim.errors|striptags }}</div>
           {% endif %}
         </div>
 
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px;">
-          <button type="submit" class="btn-submit">&#9654; emitir ticket</button>
-          <a href="{% url 'ticket_list' %}" class="btn-secondary">ver tickets</a>
+          <button type="submit" class="btn-submit">&#9654; gerar PDF</button>
+          <a href="{% url 'ticket_list' %}" class="btn-secondary">voltar aos tickets</a>
         </div>
       </form>
     </div>

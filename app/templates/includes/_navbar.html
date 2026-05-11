@@ -1,0 +1,25 @@
+<nav class="app-nav">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    vagora
+  </div>
+
+  <div class="app-nav-links">
+    <a href="{% url 'dashboard' %}" class="app-nav-link {% if nav_active == 'dashboard' %}active{% endif %}">dashboard</a>
+    <a href="{% url 'cliente_list' %}" class="app-nav-link {% if nav_active == 'clientes' %}active{% endif %}">clientes</a>
+    <a href="{% url 'veiculo_list' %}" class="app-nav-link {% if nav_active == 'veiculos' %}active{% endif %}">veículos</a>
+    <a href="{% url 'vaga_list' %}" class="app-nav-link {% if nav_active == 'vagas' %}active{% endif %}">vagas</a>
+    <a href="{% url 'ticket_list' %}" class="app-nav-link {% if nav_active == 'tickets' %}active{% endif %}">tickets</a>
+    <a href="{% url 'tarifa_list' %}" class="app-nav-link {% if nav_active == 'tarifas' %}active{% endif %}">tarifas</a>
+    <a href="{% url 'avaria_list' %}" class="app-nav-link {% if nav_active == 'avarias' %}active{% endif %}">avarias</a>
+    <a href="{% url 'relatorio_financeiro' %}" class="app-nav-link {% if nav_active == 'relatorio' %}active{% endif %}">relatorio</a>
+    <a href="{% url 'contato' %}" class="app-nav-link {% if nav_active == 'suporte' %}active{% endif %}">suporte</a>
+  </div>
+
+  <div class="app-nav-actions">
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-nav-logout">sair</button>
+    </form>
+  </div>
+</nav>
