@@ -29,8 +29,7 @@
     {% if messages %}
     <section class="dashboard-messages">
       {% for message in messages %}
-      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{
-        message }}</div>
+      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
       {% endfor %}
     </section>
     {% endif %}

@@ -609,6 +609,8 @@ class ContatoView(View):
         return render(request, 'contato.html')
 
     def post(self, request):
+        from django.core.mail import send_mail
+        
         nome = request.POST.get('nome', '').strip()
         email = request.POST.get('email', '').strip()
         assunto = request.POST.get('assunto', '').strip()
@@ -618,8 +620,21 @@ class ContatoView(View):
             messages.error(request, 'Por favor, preencha todos os campos.')
             return render(request, 'contato.html', status=400)
 
-        # Aqui você pode adicionar lógica para enviar email ou salvar em BD
-        messages.success(request, 'Mensagem enviada com sucesso! Retornaremos em breve.')
+        try:
+            email_subject = f'Novo contato: {assunto}'
+            email_body = f'Nome: {nome}\nE-mail: {email}\nAssunto: {assunto}\n\nMensagem:\n{mensagem}'
+            
+            send_mail(
+                subject=email_subject,
+                message=email_body,
+                from_email=email,
+                recipient_list=['contadofarm26@gmail.com'],
+                fail_silently=False,
+            )
+            messages.success(request, 'Mensagem enviada com sucesso! Retornaremos em breve.')
+        except Exception as e:
+            messages.error(request, 'Erro ao enviar mensagem. Tente novamente.')
+        
         return render(request, 'contato.html')
 
 
