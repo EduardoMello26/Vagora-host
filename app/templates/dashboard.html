@@ -18,7 +18,16 @@
 
   {% include 'includes/_navbar.html' with nav_active='dashboard' %}
 
+
   <main class="dashboard-main">
+
+    {% if messages %}
+    <section class="dashboard-messages">
+      {% for message in messages %}
+      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{ message }}</div>
+      {% endfor %}
+    </section>
+    {% endif %}
 
     <section class="dashboard-grid">
       <article class="dashboard-card reveal visible">
@@ -47,13 +56,15 @@
 
       <article class="dashboard-card reveal visible">
         <div class="feature-title">Relatório financeiro</div>
-        <p class="feature-desc">Gere um PDF com a quantidade de tickets, receita total e avarias por intervalo de datas.</p>
+        <p class="feature-desc">Gere um PDF com a quantidade de tickets, receita total e avarias por intervalo de datas.
+        </p>
         <a href="{% url 'relatorio_financeiro' %}" class="btn-secondary">abrir relatório</a>
       </article>
 
       <article class="dashboard-card reveal visible">
         <div class="feature-title">Tarifas por horário</div>
-        <p class="feature-desc">Ajuste os valores por hora de acordo com cada faixa de horário para cálculo do ticket.</p>
+        <p class="feature-desc">Ajuste os valores por hora de acordo com cada faixa de horário para cálculo do ticket.
+        </p>
         <a href="{% url 'tarifa_list' %}" class="btn-secondary">gerenciar tarifas</a>
       </article>
 
@@ -70,14 +81,6 @@
       </article>
     </section>
 
-    {% if messages %}
-    <section class="dashboard-messages">
-      {% for message in messages %}
-      <div class="form-feedback auto-hide-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">{{
-        message }}</div>
-      {% endfor %}
-    </section>
-    {% endif %}
 
   </main>
 
