@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from decimal import Decimal, ROUND_CEILING
+import math
 
 
 class Cliente(models.Model):
@@ -75,7 +76,14 @@ class Tarifa(models.Model):
 
     descricao = models.CharField(max_length=100, verbose_name="Descrição")
     valor_hora = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Valor por Hora")
-    valor_diaria = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name="Valor Diário")
+    PERIOD_CHOICES = [
+        ("hora", "Hora"),
+        ("dia", "Dia (valor fixo)"),
+        ("semana", "Semana (valor fixo)"),
+        ("mes", "Mês (valor fixo)"),
+    ]
+    periodo = models.CharField(max_length=10, choices=PERIOD_CHOICES, default="hora", verbose_name="Período")
+    valor_fixo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Valor Fixo")
     tipo_veiculo = models.CharField(max_length=5, choices=TIPO_VEICULO_CHOICES, default="todos", verbose_name="Tipo de Veículo")
     hora_inicio = models.TimeField(verbose_name="Hora Início")
     hora_fim = models.TimeField(verbose_name="Hora Fim")
@@ -92,7 +100,7 @@ class Tarifa(models.Model):
             raise ValidationError({"hora_fim": "A hora final deve ser maior que a hora inicial."})
 
     def __str__(self):
-        return f"{self.descricao} ({self.tipo_veiculo}) - {self.hora_inicio.strftime('%H:%M')} às {self.hora_fim.strftime('%H:%M')}"
+        return f"{self.descricao} ({self.tipo_veiculo}) - {self.hora_inicio.strftime('%H:%M')} às {self.hora_fim.strftime('%H:%M')} ({self.get_periodo_display()})"
 
     @classmethod
     def obter_tarifa_por_horario(cls, tipo_veiculo, horario):
@@ -174,17 +182,36 @@ class Pagamento(models.Model):
     @staticmethod
     def calcular_valor(ticket, tarifa, saida):
         duracao = saida - ticket.entrada
-        horas_decimais = Decimal(str(duracao.total_seconds())) / Decimal("3600")
+        total_seconds = int(duracao.total_seconds())
+
+        # If tarifa is by hour (legacy), keep existing behavior (hourly + optional daily)
+        if tarifa.periodo == "hora":
+            horas_decimais = Decimal(str(total_seconds)) / Decimal("3600")
+            horas_cobradas = int(horas_decimais.to_integral_value(rounding=ROUND_CEILING))
+            horas_cobradas = max(horas_cobradas, 1)
+
+            # Always charge by hours using valor_hora (no diaria fallback)
+            total = Decimal(horas_cobradas) * tarifa.valor_hora
+            return total.quantize(Decimal("0.01"))
+
+        # For fixed-period tariffs (day/week/month), charge by whole periods (ceiling)
+        period_seconds = {
+            "dia": 86400,
+            "semana": 604800,
+            "mes": 2592000,  # 30 days approximation
+        }.get(tarifa.periodo)
+
+        if period_seconds and tarifa.valor_fixo is not None:
+            periods = math.ceil(total_seconds / period_seconds)
+            periods = max(periods, 1)
+            total = Decimal(periods) * tarifa.valor_fixo
+            return total.quantize(Decimal("0.01"))
+
+        # Fallback to hourly calculation if configuration incomplete
+        horas_decimais = Decimal(str(total_seconds)) / Decimal("3600")
         horas_cobradas = int(horas_decimais.to_integral_value(rounding=ROUND_CEILING))
         horas_cobradas = max(horas_cobradas, 1)
-
-        if tarifa.valor_diaria and horas_cobradas >= 24:
-            dias = horas_cobradas // 24
-            horas_restantes = horas_cobradas % 24
-            total = (Decimal(dias) * tarifa.valor_diaria) + (Decimal(horas_restantes) * tarifa.valor_hora)
-        else:
-            total = Decimal(horas_cobradas) * tarifa.valor_hora
-
+        total = Decimal(horas_cobradas) * tarifa.valor_hora
         return total.quantize(Decimal("0.01"))
 
     def save(self, *args, **kwargs):

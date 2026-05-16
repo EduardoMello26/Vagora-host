@@ -36,7 +36,8 @@
         <span>tipo</span>
         <span>horário</span>
         <span>valor/h</span>
-        <span>valor/dia</span>
+        <span>período</span>
+        <span>valor fixo</span>
         <span>ações</span>
       </div>
 
@@ -46,7 +47,8 @@
           <span>{{ tarifa.get_tipo_veiculo_display }}</span>
           <span>{{ tarifa.hora_inicio|time:'H:i' }} - {{ tarifa.hora_fim|time:'H:i' }}</span>
           <span>R$ {{ tarifa.valor_hora }}</span>
-          <span>{% if tarifa.valor_diaria %}R$ {{ tarifa.valor_diaria }}{% else %}-{% endif %}</span>
+          <span>{{ tarifa.get_periodo_display }}</span>
+          <span>{% if tarifa.valor_fixo %}R$ {{ tarifa.valor_fixo }}{% else %}-{% endif %}</span>
           <span style="display:flex; gap:10px; flex-wrap:wrap;">
             <a href="{% url 'tarifa_edit' tarifa.id %}" class="btn-secondary">editar</a>
             <a href="{% url 'tarifa_delete' tarifa.id %}" class="btn-secondary">excluir</a>

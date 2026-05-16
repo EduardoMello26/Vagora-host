@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from django.db import transaction
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -60,6 +61,11 @@ def _build_simple_pdf(lines):
 
 def _format_decimal(value):
     return f"{value:.2f}"
+
+
+def _paginate_queryset(request, queryset, per_page=10):
+    paginator = Paginator(queryset, per_page)
+    return paginator.get_page(request.GET.get('page'))
 
 class IndexView(View):
     def get(self, request):
@@ -123,8 +129,8 @@ class ClienteCreateView(LoginRequiredMixin, View):
 
 class ClienteListView(LoginRequiredMixin, View):
     def get(self, request):
-        clientes = Cliente.objects.all().order_by('nome')
-        return render(request, 'cliente/cliente_list.html', {'clientes': clientes})
+        clientes = _paginate_queryset(request, Cliente.objects.all().order_by('nome'))
+        return render(request, 'cliente/cliente_list.html', {'clientes': clientes, 'page_obj': clientes})
 
 
 class ClienteUpdateView(LoginRequiredMixin, View):
@@ -182,8 +188,8 @@ class TarifaCreateView(LoginRequiredMixin, View):
 
 class TarifaListView(LoginRequiredMixin, View):
     def get(self, request):
-        tarifas = Tarifa.objects.all().order_by('hora_inicio', 'tipo_veiculo', 'descricao')
-        return render(request, 'tarifa/tarifa_list.html', {'tarifas': tarifas})
+        tarifas = _paginate_queryset(request, Tarifa.objects.all().order_by('hora_inicio', 'tipo_veiculo', 'descricao'))
+        return render(request, 'tarifa/tarifa_list.html', {'tarifas': tarifas, 'page_obj': tarifas})
 
 
 class TarifaUpdateView(LoginRequiredMixin, View):
@@ -240,8 +246,8 @@ class VeiculoCreateView(LoginRequiredMixin, View):
 
 class VeiculoListView(LoginRequiredMixin, View):
     def get(self, request):
-        veiculos = Veiculo.objects.select_related('cliente').all().order_by('placa')
-        return render(request, 'veiculo/veiculo_list.html', {'veiculos': veiculos})
+        veiculos = _paginate_queryset(request, Veiculo.objects.select_related('cliente').all().order_by('placa'))
+        return render(request, 'veiculo/veiculo_list.html', {'veiculos': veiculos, 'page_obj': veiculos})
 
 
 class VeiculoUpdateView(LoginRequiredMixin, View):
@@ -316,7 +322,10 @@ class TicketCreateView(LoginRequiredMixin, View):
 
 class TicketListView(LoginRequiredMixin, View):
     def get(self, request):
-        tickets = Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente', 'pagamento').all().order_by('-entrada')
+        tickets = _paginate_queryset(
+            request,
+            Ticket.objects.select_related('vaga', 'operador', 'veiculo', 'cliente', 'pagamento').all().order_by('-entrada'),
+        )
         pdf_ticket_id = request.GET.get('pdf_ticket_id')
         pdf_ticket_url = None
 
@@ -327,7 +336,7 @@ class TicketListView(LoginRequiredMixin, View):
             except Ticket.DoesNotExist:
                 pdf_ticket_url = None
 
-        return render(request, 'ticket/ticket_list.html', {'tickets': tickets, 'pdf_ticket_url': pdf_ticket_url})
+        return render(request, 'ticket/ticket_list.html', {'tickets': tickets, 'page_obj': tickets, 'pdf_ticket_url': pdf_ticket_url})
 
 
 class TicketPdfView(LoginRequiredMixin, View):
@@ -567,8 +576,8 @@ class AvariaCreateView(LoginRequiredMixin, View):
 
 class AvariaListView(LoginRequiredMixin, View):
     def get(self, request):
-        avarias = Avaria.objects.select_related('veiculo', 'operador').all().order_by('-registrado_em')
-        return render(request, 'avaria/avaria_list.html', {'avarias': avarias})
+        avarias = _paginate_queryset(request, Avaria.objects.select_related('veiculo', 'operador').all().order_by('-registrado_em'))
+        return render(request, 'avaria/avaria_list.html', {'avarias': avarias, 'page_obj': avarias})
 
 
 class AvariaUpdateView(LoginRequiredMixin, View):

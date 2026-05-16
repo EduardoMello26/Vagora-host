@@ -86,10 +86,20 @@
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="id_valor_diaria">Valor Diário</label>
-            {{ form.valor_diaria }}
-            {% if form.valor_diaria.errors %}
-              <div class="form-feedback error">{{ form.valor_diaria.errors|striptags }}</div>
+            <label for="id_valor_fixo">Valor Fixo</label>
+            {{ form.valor_fixo }}
+            {% if form.valor_fixo.errors %}
+              <div class="form-feedback error">{{ form.valor_fixo.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="id_periodo">Período</label>
+            {{ form.periodo }}
+            {% if form.periodo.errors %}
+              <div class="form-feedback error">{{ form.periodo.errors|striptags }}</div>
             {% endif %}
           </div>
         </div>

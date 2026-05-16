@@ -49,7 +49,6 @@ CREATE TABLE tarifa (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(100)   NOT NULL,
     valor_hora DECIMAL(8, 2)  NOT NULL,
-    valor_diaria DECIMAL(8, 2)  NULL,
     tipo_veiculo ENUM('carro', 'moto', 'todos') NOT NULL DEFAULT 'todos',
     hora_inicio TIME NOT NULL,
     hora_fim TIME NOT NULL,

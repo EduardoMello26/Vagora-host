@@ -74,14 +74,23 @@ class VeiculoForm(forms.ModelForm):
 class TarifaForm(forms.ModelForm):
     class Meta:
         model = Tarifa
-        fields = ["descricao", "tipo_veiculo", "hora_inicio", "hora_fim", "valor_hora", "valor_diaria"]
+        fields = [
+            "descricao",
+            "tipo_veiculo",
+            "hora_inicio",
+            "hora_fim",
+            "valor_hora",
+            "periodo",
+            "valor_fixo",
+        ]
         labels = {
             "descricao": "Descrição",
             "tipo_veiculo": "Tipo de Veículo",
             "hora_inicio": "Hora Início",
             "hora_fim": "Hora Fim",
             "valor_hora": "Valor por Hora",
-            "valor_diaria": "Valor Diário",
+            "periodo": "Período",
+            "valor_fixo": "Valor Fixo",
         }
         widgets = {
             "descricao": forms.TextInput(attrs={"placeholder": "tarifa padrão"}),
@@ -89,7 +98,8 @@ class TarifaForm(forms.ModelForm):
             "hora_inicio": forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
             "hora_fim": forms.TimeInput(format="%H:%M", attrs={"type": "time"}),
             "valor_hora": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
-            "valor_diaria": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+            "periodo": forms.Select(),
+            "valor_fixo": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
         }
 
     def clean(self):

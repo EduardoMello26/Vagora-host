@@ -62,6 +62,8 @@
       </article>
       {% endfor %}
     </section>
+
+    {% include 'includes/_pagination.html' with page_obj=page_obj %}
   </main>
 
   <script>
